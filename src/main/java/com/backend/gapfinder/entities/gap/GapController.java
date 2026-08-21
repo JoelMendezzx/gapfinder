@@ -11,6 +11,9 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import com.backend.gapfinder.entities.user.UserBasicDTO;
+import com.backend.gapfinder.entities.user.UserEntity;
+
 @RestController
 @RequestMapping("/gaps")
 public class GapController {
@@ -88,8 +91,9 @@ public class GapController {
     // Obtiene qué amigos (de una lista de ids) están libres ahora mismo
     // GET /gaps/available-friends?friendIds=1,2,3
     @GetMapping("/available-friends")
-    public List<Object> getAvailableFriendsNow(@RequestParam List<Long> friendIds) {
-        return List.copyOf(gapService.getAvailableFriendsNow(friendIds));
+    public List<UserBasicDTO> getAvailableFriendsNow(@RequestParam List<Long> friendIds) {
+        List<UserEntity> available = gapService.getAvailableFriendsNow(friendIds);
+        return modelMapper.map(available, new TypeToken<List<UserBasicDTO>>() {}.getType());
     }
 
 }

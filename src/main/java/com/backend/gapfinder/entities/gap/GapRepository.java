@@ -1,4 +1,4 @@
-package com.backend.gapfinder.entities.gap;
+﻿package com.backend.gapfinder.entities.gap;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -55,5 +55,13 @@ public interface GapRepository extends JpaRepository<GapEntity, Long> {
         @Param("excludeUserId") Long excludeUserId,
         @Param("now") LocalDateTime now
     );
+
+    List<GapEntity> findByStartTimeBetweenAndStartingSoonNotifiedFalse(LocalDateTime from, LocalDateTime to);
+
+    List<GapEntity> findByStartTimeLessThanEqualAndStartedNotifiedFalse(LocalDateTime now);
+
+    List<GapEntity> findByEndTimeBetweenAndEndingSoonNotifiedFalse(LocalDateTime from, LocalDateTime to);
+
+    List<GapEntity> findByEndTimeLessThanEqualAndEndedNotifiedFalse(LocalDateTime now);
 }
 

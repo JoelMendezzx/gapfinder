@@ -1,9 +1,11 @@
 package com.backend.gapfinder.entities.friendship;
 
 import com.backend.gapfinder.entities.gap.GapRepository;
+import com.backend.gapfinder.entities.notification.NotificationService;
 import com.backend.gapfinder.entities.user.UserEntity;
 import com.backend.gapfinder.entities.user.UserService;
 import com.backend.gapfinder.enums.FriendshipStatusEnum;
+import com.backend.gapfinder.enums.NotificationTypeEnum;
 import com.backend.gapfinder.exceptions.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +23,14 @@ public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
     private final UserService userService;
     private final GapRepository gapRepository;
+    private final NotificationService notificationService;
 
-    public FriendshipService(FriendshipRepository friendshipRepository, UserService userService, GapRepository gapRepository) {
+    public FriendshipService(FriendshipRepository friendshipRepository, UserService userService,
+                             GapRepository gapRepository, NotificationService notificationService) {
         this.friendshipRepository = friendshipRepository;
         this.userService = userService;
         this.gapRepository = gapRepository;
+        this.notificationService = notificationService;
     }
 
     // Enviar una solicitud de amistad
@@ -51,8 +56,17 @@ public class FriendshipService {
         friendship.setStatus(FriendshipStatusEnum.PENDING);
         friendship.setCreatedAt(LocalDateTime.now());
 
+        FriendshipEntity saved = friendshipRepository.save(friendship);
+
+        notificationService.create(
+                addresseeId,
+                NotificationTypeEnum.FRIEND_REQUEST,
+                saved.getId(),
+                requester.getName() + " te envió una solicitud de amistad"
+        );
+
         log.info("Termina proceso de enviar solicitud de amistad de {} hacia {}", requesterId, addresseeId);
-        return friendshipRepository.save(friendship);
+        return saved;
     }
 
     // Aceptar una solicitud de amistad
@@ -65,8 +79,17 @@ public class FriendshipService {
 
         friendship.setStatus(FriendshipStatusEnum.ACCEPTED);
 
+        FriendshipEntity saved = friendshipRepository.save(friendship);
+
+        notificationService.create(
+                saved.getRequester().getId(),
+                NotificationTypeEnum.FRIEND_ACCEPTED,
+                saved.getId(),
+                saved.getAddressee().getName() + " aceptó tu solicitud de amistad"
+        );
+
         log.info("Termina proceso de aceptar solicitud de amistad con id = {}", friendshipId);
-        return friendshipRepository.save(friendship);
+        return saved;
     }
 
     // Rechazar una solicitud de amistad

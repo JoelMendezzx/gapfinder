@@ -2,6 +2,7 @@ package com.backend.gapfinder.entities.opentableparticipant;
 
 import com.backend.gapfinder.entities.opentable.OpenTableEntity;
 import com.backend.gapfinder.entities.user.UserEntity;
+import com.backend.gapfinder.enums.OpenTableStatusEnum;
 import com.backend.gapfinder.enums.ResponseStatusEnum;
 import com.backend.gapfinder.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
@@ -110,5 +111,25 @@ public class OpenTableParticipantService {
         return participantRepository.findByOpenTableId(openTableId).stream()
                 .filter(participant -> participant.getRsvp() == ResponseStatusEnum.IN)
                 .count();
+    }
+
+    // Calificar (marcar si disfrutó o no) una Open Table ya finalizada,
+    // solo si el usuario fue participante activo de ella
+    @Transactional
+    public OpenTableParticipantEntity rateOpenTable(Long openTableId, Long userId, boolean enjoyed) {
+        OpenTableParticipantEntity participant = participantRepository.findByOpenTableIdAndUserId(openTableId, userId)
+                .orElseThrow(() -> new NotFoundException("El usuario no participó en esta Open Table"));
+
+        if (participant.getRsvp() != ResponseStatusEnum.IN) {
+            throw new IllegalStateException("Solo puede calificar quien estuvo dentro de la Open Table");
+        }
+
+        if (participant.getOpenTable().getStatus() != OpenTableStatusEnum.ENDED) {
+            throw new IllegalStateException("Solo se puede calificar una Open Table que ya finalizó");
+        }
+
+        participant.setEnjoyed(enjoyed);
+
+        return participantRepository.save(participant);
     }
 }

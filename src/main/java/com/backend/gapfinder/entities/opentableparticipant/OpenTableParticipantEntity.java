@@ -26,6 +26,10 @@ public class OpenTableParticipantEntity extends BaseEntity {
 
     private LocalDateTime respondedAt;
 
+    // Si a este participante le gustó la Open Table, una vez finalizada (null = sin responder)
+    @Column(name = "enjoyed")
+    private Boolean enjoyed;
+
     // Open Table a la que pertenece esta participación
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "open_table_id", nullable = false)

@@ -4,6 +4,7 @@ import com.backend.gapfinder.entities.building.BuildingEntity;
 import com.backend.gapfinder.entities.building.BuildingService;
 import com.backend.gapfinder.entities.interest.InterestEntity;
 import com.backend.gapfinder.entities.interest.InterestService;
+import com.backend.gapfinder.enums.ActivityEffortEnum;
 import com.backend.gapfinder.exceptions.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -155,6 +156,21 @@ public class UserService {
         log.info("Quitando interés {} del usuario {}", interestId, userId);
         UserEntity user = getById(userId);
         user.getInterests().removeIf(i -> i.getId().equals(interestId));
+        return userRepository.save(user);
+    }
+
+    // Actualizar la preferencia de esfuerzo de un usuario
+    @Transactional
+    public UserEntity updateEffortPreference(Long userId, ActivityEffortEnum effort) {
+        log.info("Actualizando preferencia de esfuerzo del usuario con id = {}", userId);
+
+        if (effort == null) {
+            throw new IllegalArgumentException("La preferencia de esfuerzo es obligatoria");
+        }
+
+        UserEntity user = getById(userId);
+        user.setActivityEffortPreference(effort);
+
         return userRepository.save(user);
     }
 }

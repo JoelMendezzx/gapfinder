@@ -3,7 +3,6 @@ package com.backend.gapfinder.entities.match;
 import com.backend.gapfinder.entities.activity.ActivityBasicDTO;
 import com.backend.gapfinder.entities.gap.GapBasicDTO;
 import com.backend.gapfinder.entities.message.MessageBasicDTO;
-import com.backend.gapfinder.entities.rating.RatingBasicDTO;
 import com.backend.gapfinder.entities.user.UserBasicDTO;
 import lombok.Data;
 
@@ -19,5 +18,4 @@ public class MatchCompleteDTO extends MatchBasicDTO {
 	private GapBasicDTO requesterGap;
 	private GapBasicDTO receiverGap;
 	private List<MessageBasicDTO> messages;
-	private List<RatingBasicDTO> ratings;
 }

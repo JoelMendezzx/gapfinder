@@ -1,4 +1,4 @@
-package com.backend.gapfinder.entities.match;
+﻿package com.backend.gapfinder.entities.match;
 
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.user.UserEntity;
@@ -6,7 +6,6 @@ import com.backend.gapfinder.enums.MatchStatusEnum;
 import com.backend.gapfinder.entities.activity.ActivityEntity;
 import com.backend.gapfinder.entities.gap.GapEntity;
 import com.backend.gapfinder.entities.message.MessageEntity;
-import com.backend.gapfinder.entities.rating.RatingEntity;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -84,16 +83,18 @@ public class MatchEntity extends BaseEntity {
     @EqualsAndHashCode.Exclude
     private GapEntity receiverGap;
 
+    // Si el requester repetiría su GAP con esta persona (null = sin responder)
+    @Column(name = "requester_wants_rematch")
+    private Boolean requesterWantsRematch;
+
+    // Si el receiver repetiría su GAP con esta persona (null = sin responder)
+    @Column(name = "receiver_wants_rematch")
+    private Boolean receiverWantsRematch;
+
     // Mensajes del chat de este match
     @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<MessageEntity> messages = new ArrayList<>();
-
-    // Calificaciones dejadas sobre este match
-    @OneToMany(mappedBy = "match", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<RatingEntity> ratings = new ArrayList<>();
 
 }

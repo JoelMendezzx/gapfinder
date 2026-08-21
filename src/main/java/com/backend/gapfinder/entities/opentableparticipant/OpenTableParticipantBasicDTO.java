@@ -10,4 +10,5 @@ public class OpenTableParticipantBasicDTO {
 	private Long id;
 	private ResponseStatusEnum rsvp;
 	private LocalDateTime respondedAt;
+	private Boolean enjoyed;
 }

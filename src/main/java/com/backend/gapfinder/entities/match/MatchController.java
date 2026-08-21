@@ -120,4 +120,16 @@ public class MatchController {
         return modelMapper.map(activities, new TypeToken<List<ActivityBasicDTO>>() {}.getType());
     }
 
+    // Registrar si el usuario repetiría su GAP con la otra persona del match
+    // PATCH /matches/{id}/rematch?userId=1&wantsRematch=true
+    @PatchMapping("/{id}/rematch")
+    public MatchBasicDTO setRematchPreference(
+            @PathVariable Long id,
+            @RequestParam Long userId,
+            @RequestParam boolean wantsRematch) {
+
+        MatchEntity updated = matchService.setRematchPreference(id, userId, wantsRematch);
+        return modelMapper.map(updated, MatchBasicDTO.class);
+    }
+
 }

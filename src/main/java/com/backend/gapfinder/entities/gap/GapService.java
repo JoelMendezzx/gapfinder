@@ -2,12 +2,16 @@ package com.backend.gapfinder.entities.gap;
 
 import com.backend.gapfinder.entities.classblock.ClassBlockEntity;
 import com.backend.gapfinder.entities.classblock.ClassBlockService;
+import com.backend.gapfinder.entities.notification.NotificationService;
 import com.backend.gapfinder.entities.user.UserEntity;
 import com.backend.gapfinder.entities.user.UserService;
 import com.backend.gapfinder.enums.DayOfWeekEnum;
+import com.backend.gapfinder.enums.NotificationTypeEnum;
 import com.backend.gapfinder.exceptions.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
+
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,15 +30,19 @@ public class GapService {
     // Ventana de operación del campus
     private static final LocalTime CAMPUS_OPEN = LocalTime.of(6, 30);
     private static final LocalTime CAMPUS_CLOSE = LocalTime.of(21, 30);
+    private static final long SOON_WINDOW_MINUTES = 20;
 
     private final GapRepository gapRepository;
     private final UserService userService;
     private final ClassBlockService classBlockService;
+    private final NotificationService notificationService;
 
-    public GapService(GapRepository gapRepository, UserService userService, ClassBlockService classBlockService) {
+
+    public GapService(GapRepository gapRepository, UserService userService, ClassBlockService classBlockService, NotificationService notificationService) {
         this.gapRepository = gapRepository;
         this.userService = userService;
         this.classBlockService = classBlockService;
+        this.notificationService = notificationService;
     }
 
     // Consultar un GAP por id
@@ -192,5 +200,70 @@ public class GapService {
                 friendIds,
                 LocalDateTime.now()
         );
+    }
+
+        // Job automático: revisa GAPs próximos a comenzar, que ya comenzaron,
+    // próximos a terminar, o que ya terminaron, y notifica una sola vez cada evento
+    @Scheduled(fixedRate = 600000)
+    @Transactional
+    public void checkGapNotifications() {
+        log.info("Inicia revisión de notificaciones de GAP");
+
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime soonLimit = now.plusMinutes(SOON_WINDOW_MINUTES);
+
+        // GAP_STARTING_SOON: empieza dentro de los próximos 20 minutos
+        List<GapEntity> startingSoon = gapRepository.findByStartTimeBetweenAndStartingSoonNotifiedFalse(now, soonLimit);
+        for (GapEntity gap : startingSoon) {
+            notificationService.create(
+                    gap.getUser().getId(),
+                    NotificationTypeEnum.GAP_STARTING_SOON,
+                    gap.getId(),
+                    "Tu GAP está por comenzar en breve"
+            );
+            gap.setStartingSoonNotified(true);
+        }
+        gapRepository.saveAll(startingSoon);
+
+        // GAP_STARTED: ya comenzó
+        List<GapEntity> started = gapRepository.findByStartTimeLessThanEqualAndStartedNotifiedFalse(now);
+        for (GapEntity gap : started) {
+            notificationService.create(
+                    gap.getUser().getId(),
+                    NotificationTypeEnum.GAP_STARTED,
+                    gap.getId(),
+                    "Tu GAP ha comenzado"
+            );
+            gap.setStartedNotified(true);
+        }
+        gapRepository.saveAll(started);
+
+        // GAP_ENDING_SOON: termina dentro de los próximos 20 minutos
+        List<GapEntity> endingSoon = gapRepository.findByEndTimeBetweenAndEndingSoonNotifiedFalse(now, soonLimit);
+        for (GapEntity gap : endingSoon) {
+            notificationService.create(
+                    gap.getUser().getId(),
+                    NotificationTypeEnum.GAP_ENDING_SOON,
+                    gap.getId(),
+                    "Tu GAP está por terminar"
+            );
+            gap.setEndingSoonNotified(true);
+        }
+        gapRepository.saveAll(endingSoon);
+
+        // GAP_ENDED: ya terminó
+        List<GapEntity> ended = gapRepository.findByEndTimeLessThanEqualAndEndedNotifiedFalse(now);
+        for (GapEntity gap : ended) {
+            notificationService.create(
+                    gap.getUser().getId(),
+                    NotificationTypeEnum.GAP_ENDED,
+                    gap.getId(),
+                    "Tu GAP ha terminado"
+            );
+            gap.setEndedNotified(true);
+        }
+        gapRepository.saveAll(ended);
+
+        log.info("Termina revisión de notificaciones de GAP");
     }
 }

@@ -27,6 +27,15 @@ public class GapEntity extends BaseEntity {
 
     private int durationMinutes;
 
+    // Control de notificaciones ya enviadas para este GAP (evita duplicados en el job)
+    private boolean startingSoonNotified;
+
+    private boolean startedNotified;
+
+    private boolean endingSoonNotified;
+
+    private boolean endedNotified;
+
     // Usuario dueño de este GAP
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

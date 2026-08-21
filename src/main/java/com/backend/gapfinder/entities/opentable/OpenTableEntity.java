@@ -1,4 +1,4 @@
-package com.backend.gapfinder.entities.opentable;
+﻿package com.backend.gapfinder.entities.opentable;
 
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.user.UserEntity;
@@ -6,7 +6,6 @@ import com.backend.gapfinder.enums.OpenTableStatusEnum;
 import com.backend.gapfinder.entities.building.BuildingEntity;
 import com.backend.gapfinder.entities.group.GroupEntity;
 import com.backend.gapfinder.entities.message.MessageEntity;
-import com.backend.gapfinder.entities.rating.RatingEntity;
 import com.backend.gapfinder.entities.opentableparticipant.OpenTableParticipantEntity;
 import com.backend.gapfinder.entities.activity.ActivityEntity;
 
@@ -76,12 +75,6 @@ public class OpenTableEntity extends BaseEntity {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private List<MessageEntity> messages = new ArrayList<>();
-
-    // Calificaciones dejadas sobre esta Open Table
-    @OneToMany(mappedBy = "openTable", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    @ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private List<RatingEntity> ratings = new ArrayList<>();
 
     // Participantes con su estado de RSVP
     @OneToMany(mappedBy = "openTable", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

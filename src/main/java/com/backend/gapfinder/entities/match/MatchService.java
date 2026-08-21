@@ -339,4 +339,32 @@ public class MatchService {
         return activity.getInterest() == null
             || commonInterests.contains(activity.getInterest().getId());
         }
+
+
+    // Registrar si un usuario del match repetiría su GAP con la otra persona,
+    // solo permitido si el match fue aceptado y el encuentro ya pasó
+    @Transactional
+    public MatchEntity setRematchPreference(Long matchId, Long userId, boolean wantsRematch) {
+        log.info("Registrando preferencia de rematch del usuario {} en el match {}", userId, matchId);
+
+        MatchEntity match = getById(matchId);
+
+        if (match.getStatus() != MatchStatusEnum.ACCEPTED) {
+            throw new IllegalStateException("Solo se puede calificar un match que fue aceptado");
+        }
+
+        if (match.getOverlapEnd().isAfter(LocalDateTime.now())) {
+            throw new IllegalStateException("Solo se puede calificar un match una vez que el encuentro ya terminó");
+        }
+
+        if (match.getRequester().getId().equals(userId)) {
+            match.setRequesterWantsRematch(wantsRematch);
+        } else if (match.getReceiver().getId().equals(userId)) {
+            match.setReceiverWantsRematch(wantsRematch);
+        } else {
+            throw new IllegalArgumentException("El usuario no pertenece a este match");
+        }
+
+        return matchRepository.save(match);
+    }
 }

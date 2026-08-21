@@ -7,6 +7,8 @@ import org.modelmapper.TypeToken;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
+import com.backend.gapfinder.enums.ActivityEffortEnum;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -101,6 +103,14 @@ public class UserController {
     public UserCompleteDTO removeInterest(@PathVariable Long userId, @PathVariable Long interestId) {
         UserEntity updated = userService.removeInterest(userId, interestId);
         return modelMapper.map(updated, UserCompleteDTO.class);
+    }
+
+    // Actualiza la preferencia de esfuerzo de un usuario
+    // PATCH /users/{id}/effort?effort=QUIET
+    @PatchMapping("/{id}/effort")
+    public UserBasicDTO updateEffortPreference(@PathVariable Long id, @RequestParam ActivityEffortEnum effort) {
+        UserEntity updated = userService.updateEffortPreference(id, effort);
+        return modelMapper.map(updated, UserBasicDTO.class);
     }
 
 }

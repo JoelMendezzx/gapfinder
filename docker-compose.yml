@@ -1,0 +1,42 @@
+# Levanta Postgres y la app de una sola vez:
+#   docker compose up --build
+#
+# La app queda en http://localhost:8080 y la base en localhost:5432.
+# Si alguno de esos puertos esta ocupado (Docker Desktop suele tomar el
+# 8080), se cambia sin tocar el archivo:
+#   APP_PORT=8081 docker compose up --build
+
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: gapfinder
+      POSTGRES_PASSWORD: gapfinder
+      POSTGRES_DB: gapfinder
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - gapfinder-db-data:/var/lib/postgresql/data
+    healthcheck:
+      # La app no arranca hasta que Postgres acepte conexiones de verdad
+      test: ["CMD-SHELL", "pg_isready -U gapfinder -d gapfinder"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+
+  app:
+    build: .
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Pisan lo que dice application.properties, que apunta a localhost.
+      # Dentro de la red de compose la base se llama "db".
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/gapfinder
+      SPRING_DATASOURCE_USERNAME: gapfinder
+      SPRING_DATASOURCE_PASSWORD: gapfinder
+    ports:
+      - "${APP_PORT:-8080}:8080"
+
+volumes:
+  gapfinder-db-data:

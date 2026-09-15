@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.opentableparticipant;
+package com.backend.gapfinder.entities.opentableparticipant;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

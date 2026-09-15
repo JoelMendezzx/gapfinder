@@ -91,7 +91,7 @@ public class UserService {
         existente.setProgram(user.getProgram());
         existente.setSemester(user.getSemester());
         existente.setAvatarUrl(user.getAvatarUrl());
-        existente.setMobilityPreference(user.getMobilityPreference());
+        existente.setActivityEffortPreference(user.getActivityEffortPreference());
 
         log.info("Termina proceso de actualización del usuario con id = {}", id);
         return userRepository.save(existente);

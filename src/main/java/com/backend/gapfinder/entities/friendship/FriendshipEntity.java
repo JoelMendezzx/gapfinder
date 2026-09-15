@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.friendship;
+package com.backend.gapfinder.entities.friendship;
 
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.user.UserEntity;

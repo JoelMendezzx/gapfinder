@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.gap;
+package com.backend.gapfinder.entities.gap;
 
 import java.time.LocalDateTime;
 import java.util.List;

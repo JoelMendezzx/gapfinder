@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.friendship;
+package com.backend.gapfinder.entities.friendship;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

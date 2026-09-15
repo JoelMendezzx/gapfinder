@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.notification;
+package com.backend.gapfinder.entities.notification;
 
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.user.UserEntity;

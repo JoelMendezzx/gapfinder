@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.visibilitysettings;
+package com.backend.gapfinder.entities.visibilitysettings;
 
 import java.util.Optional;
 

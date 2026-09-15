@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.rating;
+package com.backend.gapfinder.entities.rating;
 
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.user.UserEntity;

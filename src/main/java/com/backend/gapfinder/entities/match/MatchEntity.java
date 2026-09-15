@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.match;
+package com.backend.gapfinder.entities.match;
 
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.user.UserEntity;

@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.classblock;
+package com.backend.gapfinder.entities.classblock;
 
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.user.UserEntity;

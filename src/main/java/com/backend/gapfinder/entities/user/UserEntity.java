@@ -8,7 +8,7 @@ import com.backend.gapfinder.entities.classblock.ClassBlockEntity;
 import com.backend.gapfinder.entities.gap.GapEntity;
 import com.backend.gapfinder.entities.group.GroupEntity;
 import com.backend.gapfinder.entities.friendship.FriendshipEntity;
-import com.backend.gapfinder.enums.MobilityPreferenceEnum;
+import com.backend.gapfinder.enums.ActivityEffortEnum;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -44,7 +44,7 @@ public class UserEntity extends BaseEntity {
 
     // Preferencias y fechas
     @Enumerated(EnumType.STRING)
-    private MobilityPreferenceEnum mobilityPreference;
+    private ActivityEffortEnum activityEffortPreference;
 
     private LocalDateTime locationUpdatedAt;
     private LocalDateTime createdAt;

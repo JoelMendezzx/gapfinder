@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.interest;
+package com.backend.gapfinder.entities.interest;
 
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.user.UserEntity;

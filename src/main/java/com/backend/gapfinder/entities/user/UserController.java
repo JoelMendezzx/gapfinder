@@ -43,6 +43,14 @@ public class UserController {
         return modelMapper.map(user, UserBasicDTO.class);
     }
 
+    // Busca usuarios por nombre
+    // GET /users/by-name?name=Juan
+    @GetMapping("/by-name")
+    public List<UserBasicDTO> getByName(@RequestParam String name) {
+        List<UserEntity> users = userService.findByName(name);
+        return modelMapper.map(users, new TypeToken<List<UserBasicDTO>>() {}.getType());
+    }
+
     // Crea un nuevo usuario
     // POST /users
     @PostMapping

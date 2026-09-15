@@ -37,7 +37,8 @@ public class GroupController {
 
     // Obtiene un grupo dado su id
     // GET /groups/{id}
-    @GetMapping("/{id}")
+
+    @GetMapping("/{id:[0-9]+}")
     public GroupCompleteDTO getGroup(@PathVariable Long id) {
         GroupEntity group = groupService.getById(id);
         return modelMapper.map(group, GroupCompleteDTO.class);
@@ -68,5 +69,17 @@ public class GroupController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteGroup(@PathVariable Long id) {
         groupService.delete(id);
+    }
+
+    // Invita (agrega) a un amigo como miembro del grupo
+    // POST /groups/{id}/members?requesterId=1&newMemberId=2
+    @PostMapping("/{id}/members")
+    public GroupBasicDTO addMember(
+            @PathVariable Long id,
+            @RequestParam Long requesterId,
+            @RequestParam Long newMemberId) {
+
+        GroupEntity updated = groupService.addMember(id, requesterId, newMemberId);
+        return modelMapper.map(updated, GroupBasicDTO.class);
     }
 }

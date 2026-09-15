@@ -52,6 +52,13 @@ public class UserService {
                 .orElseThrow(() -> new NotFoundException("No existe un usuario con el email " + email));
     }
 
+    // Buscar usuarios por nombre
+    @Transactional(readOnly = true)
+    public List<UserEntity> findByName(String name) {
+        log.info("Inicia proceso de buscar usuarios por nombre");
+        return userRepository.findByName(name);
+    }
+
     // Crear un usuario
     @Transactional
     public UserEntity create(UserEntity user) {

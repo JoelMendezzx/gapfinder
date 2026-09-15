@@ -1,0 +1,16 @@
+package com.backend.gapfinder.enums;
+
+public enum NotificationTypeEnum {
+    MATCH_REQUEST,
+    MATCH_ACCEPTED,
+    MATCH_REJECTED,
+    FRIEND_REQUEST,
+    FRIEND_ACCEPTED,
+    OPEN_TABLE_INVITE,
+    OPEN_TABLE_JOIN,
+    GAP_STARTING_FRIEND,
+    GROUP_GAP_AVAILABLE,
+    GAP_ENDING_SOON,
+    GAP_ENDED,
+    FRIEND_OPEN_TABLE_CREATED
+}

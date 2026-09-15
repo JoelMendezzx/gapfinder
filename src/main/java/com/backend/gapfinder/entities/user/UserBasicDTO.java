@@ -1,6 +1,6 @@
 package com.backend.gapfinder.entities.user;
 
-import com.backend.gapfinder.enums.MobilityPreferenceEnum;
+import com.backend.gapfinder.enums.ActivityEffortEnum;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -14,7 +14,7 @@ public class UserBasicDTO {
 	private String semester;
 	private String avatarUrl;
 	private boolean verified;
-	private MobilityPreferenceEnum mobilityPreference;
+	private ActivityEffortEnum activityEffortPreference;
 	private LocalDateTime locationUpdatedAt;
 	private LocalDateTime createdAt;
 }

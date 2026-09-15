@@ -7,6 +7,7 @@ import com.backend.gapfinder.entities.gap.GapService;
 import com.backend.gapfinder.entities.interest.InterestEntity;
 import com.backend.gapfinder.entities.user.UserEntity;
 import com.backend.gapfinder.entities.user.UserService;
+import com.backend.gapfinder.enums.ActivityEffortEnum;
 import com.backend.gapfinder.enums.MatchStatusEnum;
 import com.backend.gapfinder.exceptions.NotFoundException;
 
@@ -223,7 +224,7 @@ public class MatchService {
         return matchRepository.save(match);
     }
 
-    // Compatibilidad entre dos usuarios: Jaccard sobre intereses en común + bonus por mobilityPreference igual
+    // Compatibilidad entre dos usuarios: Jaccard sobre intereses en común + bonus por preferencia de esfuerzo igual
     @Transactional(readOnly = true)
     public double calculateCompatibility(Long userAId, Long userBId) {
         UserEntity userA = userService.getById(userAId);
@@ -248,10 +249,10 @@ public class MatchService {
             interestScore = (double) intersection.size() / union.size();
         }
 
-        boolean sameMobility = userA.getMobilityPreference() != null
-                && userA.getMobilityPreference() == userB.getMobilityPreference();
+        boolean sameEffortPreference = userA.getActivityEffortPreference() != null
+                && userA.getActivityEffortPreference() == userB.getActivityEffortPreference();
 
-        double score = (interestScore * 0.8) + (sameMobility ? 0.2 : 0.0);
+        double score = (interestScore * 0.8) + (sameEffortPreference ? 0.2 : 0.0);
         return Math.round(score * 100.0) / 100.0;
     }
 
@@ -281,7 +282,8 @@ public class MatchService {
     // Candidato de match: el usuario, su GAP activo actual, y el score de compatibilidad (0.0–1.0)
     public record MatchCandidate(UserEntity user, GapEntity activeGap, double compatibility) {}
 
-    // Buscar actividades sugeridas según intereses comunes y tiempo disponible
+    // Buscar actividades sugeridas según intereses comunes, tiempo disponible
+    // y el nivel de esfuerzo que aceptan los dos participantes
     @Transactional(readOnly = true)
     public List<ActivityEntity> getSuggestedActivities(Long matchId, Integer availableMinutes) {
         log.info("Buscando actividades sugeridas para el match con id = {}", matchId);
@@ -298,10 +300,35 @@ public class MatchService {
         Set<Long> commonInterests = new HashSet<>(interestsA);
         commonInterests.retainAll(interestsB);
 
+        ActivityEffortEnum requiredEffort = resolveRequiredEffort(
+                match.getRequester().getActivityEffortPreference(),
+                match.getReceiver().getActivityEffortPreference());
+
         return activityService.getAll().stream()
             .filter(activity -> fitsAvailableTime(activity, availableMinutes))
             .filter(activity -> matchesCommonInterest(activity, commonInterests))
+            .filter(activity -> matchesEffortLevel(activity, requiredEffort))
                 .toList();
+    }
+
+    // Gana la preferencia mas restrictiva de los dos: si a uno le sirve algo
+    // QUIET no se proponen actividades mas exigentes. Un usuario sin
+    // preferencia no restringe, y si ninguno tiene no se filtra por esfuerzo.
+    private ActivityEffortEnum resolveRequiredEffort(ActivityEffortEnum a, ActivityEffortEnum b) {
+        if (a == null) {
+            return b;
+        }
+        if (b == null) {
+            return a;
+        }
+        return a.ordinal() <= b.ordinal() ? a : b;
+    }
+
+    // Una actividad sin nivel de esfuerzo definido no se propone mientras haya
+    // una restriccion activa: no hay como saber si respeta el limite
+    private boolean matchesEffortLevel(ActivityEntity activity, ActivityEffortEnum requiredEffort) {
+        return requiredEffort == null
+            || activity.getActivityEffortLevel() == requiredEffort;
     }
 
         private boolean fitsAvailableTime(ActivityEntity activity, Integer availableMinutes) {

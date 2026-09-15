@@ -12,17 +12,17 @@ INSERT INTO buildings (name, latitude, longitude, radius_meters) VALUES
 ('Q', 4.602300, -74.067000, 55);
 
 --USERS--
-INSERT INTO users (name, email, password_hash, program, semester, mobility_preference, avatar_url, verified, created_at, current_building_id) VALUES
-('Joel', 'joel@uniandes.edu.co', 'hash_joel_123', 'Systems Engineering', '7', 'NEAR', 'https://i.pravatar.cc/150?img=1', true, now(), NULL),
-('Maria Rojas', 'maria.rojas@uniandes.edu.co', 'hash_maria_456', 'Industrial Engineering', '5', 'MID', 'https://i.pravatar.cc/150?img=2', true, now(), NULL),
-('Santiago Gomez', 'santiago.gomez@uniandes.edu.co', 'hash_santi_789', 'Economics', '9', 'FAR', 'https://i.pravatar.cc/150?img=3', true, now(), NULL),
-('Valentina Torres', 'valentina.torres@uniandes.edu.co', 'hash_valen_012', 'Design', '3', 'NEAR', 'https://i.pravatar.cc/150?img=4', false, now(), NULL),
-('Juan Pablo Diaz', 'juanpablo.diaz@uniandes.edu.co', 'hash_juanp_345', 'Systems Engineering', '10', 'MID', 'https://i.pravatar.cc/150?img=5', true, now(), NULL),
-('Camila Herrera', 'camila.herrera@uniandes.edu.co', 'hash_cami_678', 'Law', '4', 'NEAR', 'https://i.pravatar.cc/150?img=6', true, now(), NULL),
-('Andres Castro', 'andres.castro@uniandes.edu.co', 'hash_andres_901', 'Mathematics', '6', 'FAR', 'https://i.pravatar.cc/150?img=7', false, now(), NULL),
-('Laura Martinez', 'laura.martinez@uniandes.edu.co', 'hash_laura_234', 'Biomedical Engineering', '2', 'MID', 'https://i.pravatar.cc/150?img=8', true, now(), NULL),
-('Diego Ramirez', 'diego.ramirez@uniandes.edu.co', 'hash_diego_567', 'Business Administration', '8', 'NEAR', 'https://i.pravatar.cc/150?img=9', true, now(), NULL),
-('Isabella Ortiz', 'isabella.ortiz@uniandes.edu.co', 'hash_isa_890', 'Philosophy', '1', 'FAR', 'https://i.pravatar.cc/150?img=10', false, now(), NULL);
+INSERT INTO users (name, email, password_hash, program, semester, activity_effort_preference, avatar_url, verified, created_at, current_building_id) VALUES
+('Joel', 'joel@uniandes.edu.co', 'hash_joel_123', 'Systems Engineering', '7', 'QUIET', 'https://i.pravatar.cc/150?img=1', true, now(), NULL),
+('Maria Rojas', 'maria.rojas@uniandes.edu.co', 'hash_maria_456', 'Industrial Engineering', '5', 'NORMAL', 'https://i.pravatar.cc/150?img=2', true, now(), NULL),
+('Santiago Gomez', 'santiago.gomez@uniandes.edu.co', 'hash_santi_789', 'Economics', '9', 'ACTIVE', 'https://i.pravatar.cc/150?img=3', true, now(), NULL),
+('Valentina Torres', 'valentina.torres@uniandes.edu.co', 'hash_valen_012', 'Design', '3', 'QUIET', 'https://i.pravatar.cc/150?img=4', false, now(), NULL),
+('Juan Pablo Diaz', 'juanpablo.diaz@uniandes.edu.co', 'hash_juanp_345', 'Systems Engineering', '10', 'NORMAL', 'https://i.pravatar.cc/150?img=5', true, now(), NULL),
+('Camila Herrera', 'camila.herrera@uniandes.edu.co', 'hash_cami_678', 'Law', '4', 'QUIET', 'https://i.pravatar.cc/150?img=6', true, now(), NULL),
+('Andres Castro', 'andres.castro@uniandes.edu.co', 'hash_andres_901', 'Mathematics', '6', 'ACTIVE', 'https://i.pravatar.cc/150?img=7', false, now(), NULL),
+('Laura Martinez', 'laura.martinez@uniandes.edu.co', 'hash_laura_234', 'Biomedical Engineering', '2', 'NORMAL', 'https://i.pravatar.cc/150?img=8', true, now(), NULL),
+('Diego Ramirez', 'diego.ramirez@uniandes.edu.co', 'hash_diego_567', 'Business Administration', '8', 'QUIET', 'https://i.pravatar.cc/150?img=9', true, now(), NULL),
+('Isabella Ortiz', 'isabella.ortiz@uniandes.edu.co', 'hash_isa_890', 'Philosophy', '1', 'ACTIVE', 'https://i.pravatar.cc/150?img=10', false, now(), NULL);
 
 
 --CLASS_BLOCK--
@@ -169,54 +169,54 @@ SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'isabella.ortiz@unia
 
 
 --ACTIVITIES--
-INSERT INTO activities (title, description, duration_minutes, interest_id) VALUES
+INSERT INTO activities (title, description, duration_minutes, activity_effort_level, interest_id) VALUES
 -- Football
-('Quick 5-a-side Football Match', 'Play a fast-paced 5-a-side football game at the nearest courts', 30, (SELECT id FROM interests WHERE name = 'Football')),
-('Watch Champions League Match', 'Watch a football match at the lounge or campus cafeteria', 30, (SELECT id FROM interests WHERE name = 'Football')),
+('Quick 5-a-side Football Match', 'Play a fast-paced 5-a-side football game at the nearest courts', 30, 'ACTIVE', (SELECT id FROM interests WHERE name = 'Football')),
+('Watch Champions League Match', 'Watch a football match at the lounge or campus cafeteria', 30, 'QUIET', (SELECT id FROM interests WHERE name = 'Football')),
 
 -- Basketball
-('Free Throws & 21', 'Shoot some quick hoops or play a 3x3 game at the basketball court', 30, (SELECT id FROM interests WHERE name = 'Basketball')),
-('Watch NBA Highlights', 'Share game highlights or catch an NBA game together', 30, (SELECT id FROM interests WHERE name = 'Basketball')),
+('Free Throws & 21', 'Shoot some quick hoops or play a 3x3 game at the basketball court', 30, 'ACTIVE', (SELECT id FROM interests WHERE name = 'Basketball')),
+('Watch NBA Highlights', 'Share game highlights or catch an NBA game together', 30, 'QUIET', (SELECT id FROM interests WHERE name = 'Basketball')),
 
 -- Music
-('Listen to a New Album', 'Share headphones and listen to a recent music release', 30, (SELECT id FROM interests WHERE name = 'Music')),
-('Jam Session / Play Instruments', 'Play guitar or sing together in a quiet spot on campus', 30, (SELECT id FROM interests WHERE name = 'Music')),
+('Listen to a New Album', 'Share headphones and listen to a recent music release', 30, 'QUIET', (SELECT id FROM interests WHERE name = 'Music')),
+('Jam Session / Play Instruments', 'Play guitar or sing together in a quiet spot on campus', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Music')),
 
 -- Reading
-('Express Book Club', 'Read a chapter or discuss a book both of you are currently reading', 30, (SELECT id FROM interests WHERE name = 'Reading')),
-('Book Swap', 'Bring a favorite book to recommend or lend to each other', 30, (SELECT id FROM interests WHERE name = 'Reading')),
+('Express Book Club', 'Read a chapter or discuss a book both of you are currently reading', 30, 'QUIET', (SELECT id FROM interests WHERE name = 'Reading')),
+('Book Swap', 'Bring a favorite book to recommend or lend to each other', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Reading')),
 
 -- Gaming
-('Handheld Gaming Session', 'Play a casual match on a Switch, Steam Deck, or mobile device', 30, (SELECT id FROM interests WHERE name = 'Gaming')),
-('Esports & Gaming Chat', 'Discuss recent game releases, consoles, or competitive tournaments', 30, (SELECT id FROM interests WHERE name = 'Gaming')),
+('Handheld Gaming Session', 'Play a casual match on a Switch, Steam Deck, or mobile device', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Gaming')),
+('Esports & Gaming Chat', 'Discuss recent game releases, consoles, or competitive tournaments', 30, 'QUIET', (SELECT id FROM interests WHERE name = 'Gaming')),
 
 -- Photography
-('Campus Photo Walk', 'Take photos at the best architectural and scenic spots on campus', 30, (SELECT id FROM interests WHERE name = 'Photography')),
-('Portfolio Review & Editing', 'Show recent photos and exchange editing tips in Lightroom/Photoshop', 30, (SELECT id FROM interests WHERE name = 'Photography')),
+('Campus Photo Walk', 'Take photos at the best architectural and scenic spots on campus', 30, 'ACTIVE', (SELECT id FROM interests WHERE name = 'Photography')),
+('Portfolio Review & Editing', 'Show recent photos and exchange editing tips in Lightroom/Photoshop', 30, 'QUIET', (SELECT id FROM interests WHERE name = 'Photography')),
 
 -- Coffee
-('Grab a Coffee', 'Go to a coffee shop and have a relaxed chat', 30, (SELECT id FROM interests WHERE name = 'Coffee')),
-('Express Coffee Tasting', 'Try a specialty pour-over or brew method at the campus cafe', 30, (SELECT id FROM interests WHERE name = 'Coffee')),
+('Grab a Coffee', 'Go to a coffee shop and have a relaxed chat', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Coffee')),
+('Express Coffee Tasting', 'Try a specialty pour-over or brew method at the campus cafe', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Coffee')),
 
 -- Chess
-('Blitz Chess Game', 'Play one or two fast-paced blitz chess matches', 30, (SELECT id FROM interests WHERE name = 'Chess')),
-('Solve Tactical Puzzles', 'Solve chess puzzles and analyze tactical positions together', 30, (SELECT id FROM interests WHERE name = 'Chess')),
+('Blitz Chess Game', 'Play one or two fast-paced blitz chess matches', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Chess')),
+('Solve Tactical Puzzles', 'Solve chess puzzles and analyze tactical positions together', 30, 'QUIET', (SELECT id FROM interests WHERE name = 'Chess')),
 
 -- Hiking
-('Campus Nature Walk', 'Take a refreshing outdoor walk through green areas on campus', 30, (SELECT id FROM interests WHERE name = 'Hiking')),
-('Plan Weekend Hike', 'Check out trail maps and plan a hiking trip for the weekend', 30, (SELECT id FROM interests WHERE name = 'Hiking')),
+('Campus Nature Walk', 'Take a refreshing outdoor walk through green areas on campus', 30, 'ACTIVE', (SELECT id FROM interests WHERE name = 'Hiking')),
+('Plan Weekend Hike', 'Check out trail maps and plan a hiking trip for the weekend', 30, 'QUIET', (SELECT id FROM interests WHERE name = 'Hiking')),
 
 -- Movies
-('Watch Short Films / Trailers', 'Watch a short movie or catch up on the latest film trailers', 30, (SELECT id FROM interests WHERE name = 'Movies')),
-('Film & Series Chat', 'Discuss favorite movie directors, classics, or trending TV shows', 30, (SELECT id FROM interests WHERE name = 'Movies')),
+('Watch Short Films / Trailers', 'Watch a short movie or catch up on the latest film trailers', 30, 'QUIET', (SELECT id FROM interests WHERE name = 'Movies')),
+('Film & Series Chat', 'Discuss favorite movie directors, classics, or trending TV shows', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Movies')),
 
 -- Volunteering
-('Plan Social Initiative', 'Brainstorm or organize a quick community service project', 30, (SELECT id FROM interests WHERE name = 'Volunteering')),
-('Discuss Social Impact', 'Share ideas on social projects, sustainability, and outreach', 30, (SELECT id FROM interests WHERE name = 'Volunteering')),
+('Plan Social Initiative', 'Brainstorm or organize a quick community service project', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Volunteering')),
+('Discuss Social Impact', 'Share ideas on social projects, sustainability, and outreach', 30, 'QUIET', (SELECT id FROM interests WHERE name = 'Volunteering')),
 
 -- Cooking
-('Recipe Exchange', 'Share cooking tips, favorite recipes, or meal prep ideas', 30, (SELECT id FROM interests WHERE name = 'Cooking')),
-('Eat Lunch Together', 'Share a snack or lunch together at the campus dining area', 30, (SELECT id FROM interests WHERE name = 'Cooking'));
+('Recipe Exchange', 'Share cooking tips, favorite recipes, or meal prep ideas', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Cooking')),
+('Eat Lunch Together', 'Share a snack or lunch together at the campus dining area', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Cooking'));
 
 -- ============================================================
 -- SEED GAPFINDER - estado basico
@@ -245,28 +245,28 @@ INSERT INTO activities (title, description, duration_minutes, interest_id) VALUE
 -- current_building_id queda NULL: lo actualiza la app con los
 -- UserLocationLog cuando el usuario entra a un edificio.
 
-INSERT INTO users (name, email, password_hash, program, semester, mobility_preference, avatar_url, verified, created_at, current_building_id)
+INSERT INTO users (name, email, password_hash, program, semester, activity_effort_preference, avatar_url, verified, created_at, current_building_id)
 VALUES
-('Sofia Arias',        'sofia.arias@uniandes.edu.co',        'hash_sofia_101',    'Systems Engineering',       '7',  'NEAR', 'https://i.pravatar.cc/150?img=11', true,  now(), NULL),
-('Daniela Gutierrez',  'daniela.gutierrez@uniandes.edu.co',  'hash_daniela_102',  'Design',                    '6',  'MID',  'https://i.pravatar.cc/150?img=12', true,  now(), NULL),
-('Nicolas Pardo',      'nicolas.pardo@uniandes.edu.co',      'hash_nicolas_103',  'Systems Engineering',       '8',  'FAR',  'https://i.pravatar.cc/150?img=13', true,  now(), NULL),
-('Miguel Cabrera',     'miguel.cabrera@uniandes.edu.co',     'hash_miguel_104',   'Systems Engineering',       '7',  'NEAR', 'https://i.pravatar.cc/150?img=14', true,  now(), NULL),
-('Mariana Lopez',      'mariana.lopez@uniandes.edu.co',      'hash_mariana_105',  'Psychology',                '4',  'MID',  'https://i.pravatar.cc/150?img=15', true,  now(), NULL),
-('Tomas Restrepo',     'tomas.restrepo@uniandes.edu.co',     'hash_tomas_106',    'Mechanical Engineering',    '5',  'FAR',  'https://i.pravatar.cc/150?img=16', false, now(), NULL),
-('Paula Jimenez',      'paula.jimenez@uniandes.edu.co',      'hash_paula_107',    'Medicine',                  '6',  'NEAR', 'https://i.pravatar.cc/150?img=17', true,  now(), NULL),
-('Felipe Moreno',      'felipe.moreno@uniandes.edu.co',      'hash_felipe_108',   'Economics',                 '3',  'MID',  'https://i.pravatar.cc/150?img=18', true,  now(), NULL),
-('Daniel Vargas',      'daniel.vargas@uniandes.edu.co',      'hash_daniel_109',   'Systems Engineering',       '9',  'NEAR', 'https://i.pravatar.cc/150?img=19', true,  now(), NULL),
-('Antonia Silva',      'antonia.silva@uniandes.edu.co',      'hash_antonia_110',  'Literature',                '2',  'FAR',  'https://i.pravatar.cc/150?img=20', false, now(), NULL),
-('Sebastian Rincon',   'sebastian.rincon@uniandes.edu.co',   'hash_sebas_111',    'Industrial Engineering',    '7',  'MID',  'https://i.pravatar.cc/150?img=21', true,  now(), NULL),
-('Juliana Pena',       'juliana.pena@uniandes.edu.co',       'hash_juliana_112',  'Architecture',              '5',  'NEAR', 'https://i.pravatar.cc/150?img=22', true,  now(), NULL),
-('Carlos Mendoza',     'carlos.mendoza@uniandes.edu.co',     'hash_carlos_113',   'Physics',                   '8',  'FAR',  'https://i.pravatar.cc/150?img=23', true,  now(), NULL),
-('Natalia Rueda',      'natalia.rueda@uniandes.edu.co',      'hash_natalia_114',  'Biology',                   '4',  'MID',  'https://i.pravatar.cc/150?img=24', false, now(), NULL),
-('Esteban Ortiz',      'esteban.ortiz@uniandes.edu.co',      'hash_esteban_115',  'Civil Engineering',         '6',  'NEAR', 'https://i.pravatar.cc/150?img=25', true,  now(), NULL),
-('Gabriela Nieto',     'gabriela.nieto@uniandes.edu.co',     'hash_gabriela_116', 'Political Science',         '3',  'MID',  'https://i.pravatar.cc/150?img=26', true,  now(), NULL),
-('Ricardo Salazar',    'ricardo.salazar@uniandes.edu.co',    'hash_ricardo_117',  'Chemical Engineering',      '9',  'FAR',  'https://i.pravatar.cc/150?img=27', true,  now(), NULL),
-('Valeria Cardenas',   'valeria.cardenas@uniandes.edu.co',   'hash_valeria_118',  'Music',                     '5',  'NEAR', 'https://i.pravatar.cc/150?img=28', true,  now(), NULL),
-('Simon Aguilar',      'simon.aguilar@uniandes.edu.co',      'hash_simon_119',    'Anthropology',              '2',  'MID',  'https://i.pravatar.cc/150?img=29', false, now(), NULL),
-('Lucia Beltran',      'lucia.beltran@uniandes.edu.co',      'hash_lucia_120',    'Environmental Engineering', '7',  'NEAR', 'https://i.pravatar.cc/150?img=30', true,  now(), NULL)
+('Sofia Arias',        'sofia.arias@uniandes.edu.co',        'hash_sofia_101',    'Systems Engineering',       '7',  'QUIET', 'https://i.pravatar.cc/150?img=11', true,  now(), NULL),
+('Daniela Gutierrez',  'daniela.gutierrez@uniandes.edu.co',  'hash_daniela_102',  'Design',                    '6',  'NORMAL',  'https://i.pravatar.cc/150?img=12', true,  now(), NULL),
+('Nicolas Pardo',      'nicolas.pardo@uniandes.edu.co',      'hash_nicolas_103',  'Systems Engineering',       '8',  'ACTIVE',  'https://i.pravatar.cc/150?img=13', true,  now(), NULL),
+('Miguel Cabrera',     'miguel.cabrera@uniandes.edu.co',     'hash_miguel_104',   'Systems Engineering',       '7',  'QUIET', 'https://i.pravatar.cc/150?img=14', true,  now(), NULL),
+('Mariana Lopez',      'mariana.lopez@uniandes.edu.co',      'hash_mariana_105',  'Psychology',                '4',  'NORMAL',  'https://i.pravatar.cc/150?img=15', true,  now(), NULL),
+('Tomas Restrepo',     'tomas.restrepo@uniandes.edu.co',     'hash_tomas_106',    'Mechanical Engineering',    '5',  'ACTIVE',  'https://i.pravatar.cc/150?img=16', false, now(), NULL),
+('Paula Jimenez',      'paula.jimenez@uniandes.edu.co',      'hash_paula_107',    'Medicine',                  '6',  'QUIET', 'https://i.pravatar.cc/150?img=17', true,  now(), NULL),
+('Felipe Moreno',      'felipe.moreno@uniandes.edu.co',      'hash_felipe_108',   'Economics',                 '3',  'NORMAL',  'https://i.pravatar.cc/150?img=18', true,  now(), NULL),
+('Daniel Vargas',      'daniel.vargas@uniandes.edu.co',      'hash_daniel_109',   'Systems Engineering',       '9',  'QUIET', 'https://i.pravatar.cc/150?img=19', true,  now(), NULL),
+('Antonia Silva',      'antonia.silva@uniandes.edu.co',      'hash_antonia_110',  'Literature',                '2',  'ACTIVE',  'https://i.pravatar.cc/150?img=20', false, now(), NULL),
+('Sebastian Rincon',   'sebastian.rincon@uniandes.edu.co',   'hash_sebas_111',    'Industrial Engineering',    '7',  'NORMAL',  'https://i.pravatar.cc/150?img=21', true,  now(), NULL),
+('Juliana Pena',       'juliana.pena@uniandes.edu.co',       'hash_juliana_112',  'Architecture',              '5',  'QUIET', 'https://i.pravatar.cc/150?img=22', true,  now(), NULL),
+('Carlos Mendoza',     'carlos.mendoza@uniandes.edu.co',     'hash_carlos_113',   'Physics',                   '8',  'ACTIVE',  'https://i.pravatar.cc/150?img=23', true,  now(), NULL),
+('Natalia Rueda',      'natalia.rueda@uniandes.edu.co',      'hash_natalia_114',  'Biology',                   '4',  'NORMAL',  'https://i.pravatar.cc/150?img=24', false, now(), NULL),
+('Esteban Ortiz',      'esteban.ortiz@uniandes.edu.co',      'hash_esteban_115',  'Civil Engineering',         '6',  'QUIET', 'https://i.pravatar.cc/150?img=25', true,  now(), NULL),
+('Gabriela Nieto',     'gabriela.nieto@uniandes.edu.co',     'hash_gabriela_116', 'Political Science',         '3',  'NORMAL',  'https://i.pravatar.cc/150?img=26', true,  now(), NULL),
+('Ricardo Salazar',    'ricardo.salazar@uniandes.edu.co',    'hash_ricardo_117',  'Chemical Engineering',      '9',  'ACTIVE',  'https://i.pravatar.cc/150?img=27', true,  now(), NULL),
+('Valeria Cardenas',   'valeria.cardenas@uniandes.edu.co',   'hash_valeria_118',  'Music',                     '5',  'QUIET', 'https://i.pravatar.cc/150?img=28', true,  now(), NULL),
+('Simon Aguilar',      'simon.aguilar@uniandes.edu.co',      'hash_simon_119',    'Anthropology',              '2',  'NORMAL',  'https://i.pravatar.cc/150?img=29', false, now(), NULL),
+('Lucia Beltran',      'lucia.beltran@uniandes.edu.co',      'hash_lucia_120',    'Environmental Engineering', '7',  'QUIET', 'https://i.pravatar.cc/150?img=30', true,  now(), NULL)
 ON CONFLICT (email) DO NOTHING;
 
 

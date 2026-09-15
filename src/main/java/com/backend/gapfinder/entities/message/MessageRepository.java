@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.message;
+package com.backend.gapfinder.entities.message;
 
 import java.util.List;
 

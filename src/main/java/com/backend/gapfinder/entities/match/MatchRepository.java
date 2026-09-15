@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.match;
+package com.backend.gapfinder.entities.match;
 
 import com.backend.gapfinder.enums.MatchStatusEnum;
 import org.springframework.data.jpa.repository.JpaRepository;

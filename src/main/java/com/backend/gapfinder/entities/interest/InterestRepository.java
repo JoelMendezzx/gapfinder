@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.interest;
+package com.backend.gapfinder.entities.interest;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

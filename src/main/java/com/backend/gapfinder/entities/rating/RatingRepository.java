@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.rating;
+package com.backend.gapfinder.entities.rating;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.notification;
+package com.backend.gapfinder.entities.notification;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

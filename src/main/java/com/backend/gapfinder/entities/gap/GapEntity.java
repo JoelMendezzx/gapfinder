@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.gap;
+package com.backend.gapfinder.entities.gap;
 
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.userlocationlog.UserLocationLogEntity;

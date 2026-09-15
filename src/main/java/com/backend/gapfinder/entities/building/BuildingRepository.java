@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.building;
+package com.backend.gapfinder.entities.building;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

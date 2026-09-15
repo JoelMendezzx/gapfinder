@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.opentable;
+package com.backend.gapfinder.entities.opentable;
 
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.user.UserEntity;

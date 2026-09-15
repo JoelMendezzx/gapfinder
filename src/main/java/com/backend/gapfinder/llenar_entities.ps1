@@ -48,7 +48,9 @@ public class $($entidad)Entity extends BaseEntity {
 }
 "@
 
-    Set-Content -Path $rutaArchivo -Value $contenido -Encoding UTF8
+    # UTF8Encoding($false) escribe sin BOM. Con -Encoding UTF8, PowerShell 5.1
+    # antepone EF BB BF y javac falla con: illegal character: '\ufeff'
+    [System.IO.File]::WriteAllText($rutaArchivo, $contenido, (New-Object System.Text.UTF8Encoding $false))
     Write-Host "Actualizado: $rutaArchivo"
 }
 

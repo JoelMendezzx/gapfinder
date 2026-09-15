@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.message;
+package com.backend.gapfinder.entities.message;
 
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.user.UserEntity;

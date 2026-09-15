@@ -1,4 +1,4 @@
-﻿package com.backend.gapfinder.entities.userlocationlog;
+package com.backend.gapfinder.entities.userlocationlog;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

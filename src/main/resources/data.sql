@@ -9,7 +9,8 @@ INSERT INTO buildings (name, latitude, longitude, radius_meters) VALUES
 ('LLERAS', 4.602800, -74.065900, 45),
 ('TX', 4.600500, -74.065300, 50),
 ('C', 4.601600, -74.067200, 50),
-('Q', 4.602300, -74.067000, 55);
+('Q', 4.602300, -74.067000, 55)
+ON CONFLICT (name) DO NOTHING;
 
 --USERS--
 INSERT INTO users (name, email, password_hash, program, semester, activity_effort_preference, avatar_url, verified, created_at, current_building_id) VALUES
@@ -22,14 +23,16 @@ INSERT INTO users (name, email, password_hash, program, semester, activity_effor
 ('Andres Castro', 'andres.castro@uniandes.edu.co', 'hash_andres_901', 'Mathematics', '6', 'ACTIVE', 'https://i.pravatar.cc/150?img=7', false, now(), NULL),
 ('Laura Martinez', 'laura.martinez@uniandes.edu.co', 'hash_laura_234', 'Biomedical Engineering', '2', 'NORMAL', 'https://i.pravatar.cc/150?img=8', true, now(), NULL),
 ('Diego Ramirez', 'diego.ramirez@uniandes.edu.co', 'hash_diego_567', 'Business Administration', '8', 'QUIET', 'https://i.pravatar.cc/150?img=9', true, now(), NULL),
-('Isabella Ortiz', 'isabella.ortiz@uniandes.edu.co', 'hash_isa_890', 'Philosophy', '1', 'ACTIVE', 'https://i.pravatar.cc/150?img=10', false, now(), NULL);
+('Isabella Ortiz', 'isabella.ortiz@uniandes.edu.co', 'hash_isa_890', 'Philosophy', '1', 'ACTIVE', 'https://i.pravatar.cc/150?img=10', false, now(), NULL)
+ON CONFLICT (email) DO NOTHING;
 
 
 --CLASS_BLOCK--
 
-INSERT INTO class_blocks (user_id, day_of_week, start_time, end_time, subject, location) VALUES
+INSERT INTO class_blocks (user_id, day_of_week, start_time, end_time, subject, location)
+SELECT v.* FROM (VALUES
 -- Grupo 1: gap común 10:00 - 12:00
-((SELECT id FROM users WHERE email = 'joel@uniandes.edu.co'), 'MON', '08:00', '10:00', 'Machine Learning', 'ML-301'),
+((SELECT id FROM users WHERE email = 'joel@uniandes.edu.co'), 'MON'::varchar, '08:00'::time, '10:00'::time, 'Machine Learning'::varchar, 'ML-301'::varchar),
 ((SELECT id FROM users WHERE email = 'joel@uniandes.edu.co'), 'MON', '12:00', '14:00', 'Software Engineering', 'SD-405'),
 
 ((SELECT id FROM users WHERE email = 'maria.rojas@uniandes.edu.co'), 'MON', '07:00', '10:00', 'Operations Research', 'SD-201'),
@@ -58,11 +61,18 @@ INSERT INTO class_blocks (user_id, day_of_week, start_time, end_time, subject, l
 ((SELECT id FROM users WHERE email = 'diego.ramirez@uniandes.edu.co'), 'MON', '16:00', '18:00', 'Marketing', 'Q-302'),
 
 ((SELECT id FROM users WHERE email = 'isabella.ortiz@uniandes.edu.co'), 'MON', '10:00', '14:00', 'Ethics', 'B-301'),
-((SELECT id FROM users WHERE email = 'isabella.ortiz@uniandes.edu.co'), 'MON', '16:00', '17:00', 'Metaphysics', 'B-302');
+((SELECT id FROM users WHERE email = 'isabella.ortiz@uniandes.edu.co'), 'MON', '16:00', '17:00', 'Metaphysics', 'B-302')
+) AS v (user_id, day_of_week, start_time, end_time, subject, location)
+WHERE NOT EXISTS (
+  SELECT 1 FROM class_blocks cb
+  WHERE cb.user_id = v.user_id AND cb.day_of_week = v.day_of_week
+    AND cb.start_time = v.start_time
+);
 
-INSERT INTO class_blocks (user_id, day_of_week, start_time, end_time, subject, location) VALUES
+INSERT INTO class_blocks (user_id, day_of_week, start_time, end_time, subject, location)
+SELECT v.* FROM (VALUES
 -- Gap común 09:00 - 11:00
-((SELECT id FROM users WHERE email = 'joel@uniandes.edu.co'), 'WED', '07:00', '09:00', 'Algorithms', 'ML-201'),
+((SELECT id FROM users WHERE email = 'joel@uniandes.edu.co'), 'WED'::varchar, '07:00'::time, '09:00'::time, 'Algorithms'::varchar, 'ML-201'::varchar),
 ((SELECT id FROM users WHERE email = 'joel@uniandes.edu.co'), 'WED', '11:00', '13:00', 'Distributed Systems', 'ML-305'),
 
 ((SELECT id FROM users WHERE email = 'santiago.gomez@uniandes.edu.co'), 'WED', '07:30', '09:00', 'Microeconomics', 'W-102'),
@@ -91,11 +101,18 @@ INSERT INTO class_blocks (user_id, day_of_week, start_time, end_time, subject, l
 ((SELECT id FROM users WHERE email = 'laura.martinez@uniandes.edu.co'), 'WED', '17:00', '18:00', 'Physiology', 'C-103'),
 
 ((SELECT id FROM users WHERE email = 'isabella.ortiz@uniandes.edu.co'), 'WED', '09:00', '15:00', 'Ethics', 'B-301'),
-((SELECT id FROM users WHERE email = 'isabella.ortiz@uniandes.edu.co'), 'WED', '17:00', '18:00', 'Logic', 'B-303');
+((SELECT id FROM users WHERE email = 'isabella.ortiz@uniandes.edu.co'), 'WED', '17:00', '18:00', 'Logic', 'B-303')
+) AS v (user_id, day_of_week, start_time, end_time, subject, location)
+WHERE NOT EXISTS (
+  SELECT 1 FROM class_blocks cb
+  WHERE cb.user_id = v.user_id AND cb.day_of_week = v.day_of_week
+    AND cb.start_time = v.start_time
+);
 
-INSERT INTO class_blocks (user_id, day_of_week, start_time, end_time, subject, location) VALUES
+INSERT INTO class_blocks (user_id, day_of_week, start_time, end_time, subject, location)
+SELECT v.* FROM (VALUES
 -- Gap común 11:00 - 13:00
-((SELECT id FROM users WHERE email = 'joel@uniandes.edu.co'), 'FRI', '08:00', '11:00', 'Machine Learning', 'ML-301'),
+((SELECT id FROM users WHERE email = 'joel@uniandes.edu.co'), 'FRI'::varchar, '08:00'::time, '11:00'::time, 'Machine Learning'::varchar, 'ML-301'::varchar),
 ((SELECT id FROM users WHERE email = 'joel@uniandes.edu.co'), 'FRI', '13:00', '15:00', 'Software Engineering', 'SD-405'),
 
 ((SELECT id FROM users WHERE email = 'maria.rojas@uniandes.edu.co'), 'FRI', '08:00', '11:00', 'Statistics', 'SD-302'),
@@ -124,7 +141,13 @@ INSERT INTO class_blocks (user_id, day_of_week, start_time, end_time, subject, l
 ((SELECT id FROM users WHERE email = 'diego.ramirez@uniandes.edu.co'), 'FRI', '15:00', '17:00', 'Finance', 'Q-301'),
 
 ((SELECT id FROM users WHERE email = 'laura.martinez@uniandes.edu.co'), 'FRI', '08:00', '13:00', 'Biomechanics', 'C-102'),
-((SELECT id FROM users WHERE email = 'laura.martinez@uniandes.edu.co'), 'FRI', '15:00', '17:00', 'Anatomy Lab', 'C-101');
+((SELECT id FROM users WHERE email = 'laura.martinez@uniandes.edu.co'), 'FRI', '15:00', '17:00', 'Anatomy Lab', 'C-101')
+) AS v (user_id, day_of_week, start_time, end_time, subject, location)
+WHERE NOT EXISTS (
+  SELECT 1 FROM class_blocks cb
+  WHERE cb.user_id = v.user_id AND cb.day_of_week = v.day_of_week
+    AND cb.start_time = v.start_time
+);
 
 --GAPS--
 --La app los calcula automáticamente--
@@ -143,35 +166,47 @@ INSERT INTO interests (name) VALUES
 ('Hiking'),
 ('Movies'),
 ('Volunteering'),
-('Cooking');
+('Cooking')
+ON CONFLICT (name) DO NOTHING;
 
 --ASOCIAR INTERESES A USUARIOS--
 INSERT INTO user_interest (user_id, interest_id)
 SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'joel@uniandes.edu.co' AND i.name IN ('Gaming', 'Music', 'Coffee', 'Chess')
+  AND NOT EXISTS (SELECT 1 FROM user_interest ui WHERE ui.user_id = u.id AND ui.interest_id = i.id)
 UNION ALL
 SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'maria.rojas@uniandes.edu.co' AND i.name IN ('Coffee', 'Reading', 'Volunteering')
+  AND NOT EXISTS (SELECT 1 FROM user_interest ui WHERE ui.user_id = u.id AND ui.interest_id = i.id)
 UNION ALL
 SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'santiago.gomez@uniandes.edu.co' AND i.name IN ('Football', 'Basketball', 'Coffee', 'Movies', 'Chess')
+  AND NOT EXISTS (SELECT 1 FROM user_interest ui WHERE ui.user_id = u.id AND ui.interest_id = i.id)
 UNION ALL
 SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'valentina.torres@uniandes.edu.co' AND i.name IN ('Photography', 'Music', 'Movies')
+  AND NOT EXISTS (SELECT 1 FROM user_interest ui WHERE ui.user_id = u.id AND ui.interest_id = i.id)
 UNION ALL
 SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'juanpablo.diaz@uniandes.edu.co' AND i.name IN ('Gaming', 'Coffee')
+  AND NOT EXISTS (SELECT 1 FROM user_interest ui WHERE ui.user_id = u.id AND ui.interest_id = i.id)
 UNION ALL
 SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'camila.herrera@uniandes.edu.co' AND i.name IN ('Reading', 'Volunteering', 'Coffee', 'Hiking')
+  AND NOT EXISTS (SELECT 1 FROM user_interest ui WHERE ui.user_id = u.id AND ui.interest_id = i.id)
 UNION ALL
 SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'andres.castro@uniandes.edu.co' AND i.name IN ('Chess', 'Gaming', 'Music', 'Reading', 'Hiking')
+  AND NOT EXISTS (SELECT 1 FROM user_interest ui WHERE ui.user_id = u.id AND ui.interest_id = i.id)
 UNION ALL
 SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'laura.martinez@uniandes.edu.co' AND i.name IN ('Cooking', 'Music', 'Volunteering')
+  AND NOT EXISTS (SELECT 1 FROM user_interest ui WHERE ui.user_id = u.id AND ui.interest_id = i.id)
 UNION ALL
 SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'diego.ramirez@uniandes.edu.co' AND i.name IN ('Football', 'Basketball', 'Coffee')
+  AND NOT EXISTS (SELECT 1 FROM user_interest ui WHERE ui.user_id = u.id AND ui.interest_id = i.id)
 UNION ALL
-SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'isabella.ortiz@uniandes.edu.co' AND i.name IN ('Reading', 'Movies', 'Hiking', 'Coffee', 'Chess');
+SELECT u.id, i.id FROM users u, interests i WHERE u.email = 'isabella.ortiz@uniandes.edu.co' AND i.name IN ('Reading', 'Movies', 'Hiking', 'Coffee', 'Chess')
+  AND NOT EXISTS (SELECT 1 FROM user_interest ui WHERE ui.user_id = u.id AND ui.interest_id = i.id);
 
 
 --ACTIVITIES--
-INSERT INTO activities (title, description, duration_minutes, activity_effort_level, interest_id) VALUES
+INSERT INTO activities (title, description, duration_minutes, activity_effort_level, interest_id)
+SELECT v.* FROM (VALUES
 -- Football
-('Quick 5-a-side Football Match', 'Play a fast-paced 5-a-side football game at the nearest courts', 30, 'ACTIVE', (SELECT id FROM interests WHERE name = 'Football')),
+('Quick 5-a-side Football Match'::varchar, 'Play a fast-paced 5-a-side football game at the nearest courts'::varchar, 30, 'ACTIVE'::varchar, (SELECT id FROM interests WHERE name = 'Football')),
 ('Watch Champions League Match', 'Watch a football match at the lounge or campus cafeteria', 30, 'QUIET', (SELECT id FROM interests WHERE name = 'Football')),
 
 -- Basketball
@@ -216,7 +251,11 @@ INSERT INTO activities (title, description, duration_minutes, activity_effort_le
 
 -- Cooking
 ('Recipe Exchange', 'Share cooking tips, favorite recipes, or meal prep ideas', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Cooking')),
-('Eat Lunch Together', 'Share a snack or lunch together at the campus dining area', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Cooking'));
+('Eat Lunch Together', 'Share a snack or lunch together at the campus dining area', 30, 'NORMAL', (SELECT id FROM interests WHERE name = 'Cooking'))
+) AS v (title, description, duration_minutes, activity_effort_level, interest_id)
+WHERE NOT EXISTS (
+  SELECT 1 FROM activities a WHERE a.title = v.title
+);
 
 -- ============================================================
 -- SEED GAPFINDER - estado basico

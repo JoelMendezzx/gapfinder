@@ -2,9 +2,10 @@ package com.backend.gapfinder.entities.gap;
 
 import com.backend.gapfinder.entities.classblock.ClassBlockEntity;
 import com.backend.gapfinder.entities.classblock.ClassBlockService;
-import com.backend.gapfinder.entities.notification.NotificationService;
 import com.backend.gapfinder.entities.user.UserEntity;
 import com.backend.gapfinder.entities.user.UserService;
+import com.backend.gapfinder.events.NotificationEvent;
+import com.backend.gapfinder.events.NotificationPublisher;
 import com.backend.gapfinder.enums.DayOfWeekEnum;
 import com.backend.gapfinder.enums.NotificationTypeEnum;
 import com.backend.gapfinder.exceptions.NotFoundException;
@@ -35,14 +36,14 @@ public class GapService {
     private final GapRepository gapRepository;
     private final UserService userService;
     private final ClassBlockService classBlockService;
-    private final NotificationService notificationService;
+    private final NotificationPublisher notificationPublisher;
 
 
-    public GapService(GapRepository gapRepository, UserService userService, ClassBlockService classBlockService, NotificationService notificationService) {
+    public GapService(GapRepository gapRepository, UserService userService, ClassBlockService classBlockService, NotificationPublisher notificationPublisher) {
         this.gapRepository = gapRepository;
         this.userService = userService;
         this.classBlockService = classBlockService;
-        this.notificationService = notificationService;
+        this.notificationPublisher = notificationPublisher;
     }
 
     // Consultar un GAP por id
@@ -215,12 +216,12 @@ public class GapService {
         // GAP_STARTING_SOON: empieza dentro de los próximos 20 minutos
         List<GapEntity> startingSoon = gapRepository.findByStartTimeBetweenAndStartingSoonNotifiedFalse(now, soonLimit);
         for (GapEntity gap : startingSoon) {
-            notificationService.create(
-                    gap.getUser().getId(),
-                    NotificationTypeEnum.GAP_STARTING_SOON,
-                    gap.getId(),
-                    "Tu GAP está por comenzar en breve"
-            );
+            notificationPublisher.publish(new NotificationEvent(
+                gap.getUser().getId(),
+                NotificationTypeEnum.GAP_STARTING_SOON,
+                gap.getId(),
+                "Tu GAP está por comenzar en breve"
+            ));
             gap.setStartingSoonNotified(true);
         }
         gapRepository.saveAll(startingSoon);
@@ -228,12 +229,12 @@ public class GapService {
         // GAP_STARTED: ya comenzó
         List<GapEntity> started = gapRepository.findByStartTimeLessThanEqualAndStartedNotifiedFalse(now);
         for (GapEntity gap : started) {
-            notificationService.create(
-                    gap.getUser().getId(),
-                    NotificationTypeEnum.GAP_STARTED,
-                    gap.getId(),
-                    "Tu GAP ha comenzado"
-            );
+            notificationPublisher.publish(new NotificationEvent(
+                gap.getUser().getId(),
+                NotificationTypeEnum.GAP_STARTED,
+                gap.getId(),
+                "Tu GAP ha comenzado"
+            ));
             gap.setStartedNotified(true);
         }
         gapRepository.saveAll(started);
@@ -241,12 +242,12 @@ public class GapService {
         // GAP_ENDING_SOON: termina dentro de los próximos 20 minutos
         List<GapEntity> endingSoon = gapRepository.findByEndTimeBetweenAndEndingSoonNotifiedFalse(now, soonLimit);
         for (GapEntity gap : endingSoon) {
-            notificationService.create(
-                    gap.getUser().getId(),
-                    NotificationTypeEnum.GAP_ENDING_SOON,
-                    gap.getId(),
-                    "Tu GAP está por terminar"
-            );
+            notificationPublisher.publish(new NotificationEvent(
+                gap.getUser().getId(),
+                NotificationTypeEnum.GAP_ENDING_SOON,
+                gap.getId(),
+                "Tu GAP está por terminar"
+            ));
             gap.setEndingSoonNotified(true);
         }
         gapRepository.saveAll(endingSoon);
@@ -254,12 +255,12 @@ public class GapService {
         // GAP_ENDED: ya terminó
         List<GapEntity> ended = gapRepository.findByEndTimeLessThanEqualAndEndedNotifiedFalse(now);
         for (GapEntity gap : ended) {
-            notificationService.create(
-                    gap.getUser().getId(),
-                    NotificationTypeEnum.GAP_ENDED,
-                    gap.getId(),
-                    "Tu GAP ha terminado"
-            );
+            notificationPublisher.publish(new NotificationEvent(
+                gap.getUser().getId(),
+                NotificationTypeEnum.GAP_ENDED,
+                gap.getId(),
+                "Tu GAP ha terminado"
+            ));
             gap.setEndedNotified(true);
         }
         gapRepository.saveAll(ended);

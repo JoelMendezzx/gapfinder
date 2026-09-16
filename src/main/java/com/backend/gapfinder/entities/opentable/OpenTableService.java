@@ -8,7 +8,6 @@ import com.backend.gapfinder.entities.gap.GapService;
 import com.backend.gapfinder.entities.group.GroupEntity;
 import com.backend.gapfinder.entities.group.GroupService;
 import com.backend.gapfinder.entities.interest.InterestEntity;
-import com.backend.gapfinder.entities.notification.NotificationService;
 import com.backend.gapfinder.entities.opentableparticipant.OpenTableParticipantEntity;
 import com.backend.gapfinder.entities.opentableparticipant.OpenTableParticipantService;
 import com.backend.gapfinder.entities.user.UserEntity;
@@ -16,6 +15,8 @@ import com.backend.gapfinder.entities.user.UserService;
 import com.backend.gapfinder.enums.NotificationTypeEnum;
 import com.backend.gapfinder.enums.OpenTableStatusEnum;
 import com.backend.gapfinder.enums.ResponseStatusEnum;
+import com.backend.gapfinder.events.NotificationEvent;
+import com.backend.gapfinder.events.NotificationPublisher;
 import com.backend.gapfinder.exceptions.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -40,7 +41,7 @@ public class OpenTableService {
     private final GroupService groupService;
     private final GapService gapService;
     private final ActivityService activityService;
-    private final NotificationService notificationService;
+    private final NotificationPublisher notificationPublisher;
 
     public OpenTableService(OpenTableRepository openTableRepository,
                             OpenTableParticipantService participantService,
@@ -49,7 +50,7 @@ public class OpenTableService {
                             GroupService groupService,
                             GapService gapService,
                             ActivityService activityService,
-                        NotificationService notificationService) {
+                            NotificationPublisher notificationPublisher) {
         this.openTableRepository = openTableRepository;
         this.participantService = participantService;
         this.userService = userService;
@@ -57,7 +58,7 @@ public class OpenTableService {
         this.groupService = groupService;
         this.gapService = gapService;
         this.activityService = activityService;
-        this.notificationService = notificationService;
+        this.notificationPublisher = notificationPublisher;
     }
 
     // Crear una Open Table (pública o privada de grupo), validando GAP activo del creador
@@ -130,12 +131,12 @@ public class OpenTableService {
 
                 participantService.invite(saved, member);
 
-                notificationService.create(
+                notificationPublisher.publish(new NotificationEvent(
                         member.getId(),
                         NotificationTypeEnum.OPEN_TABLE_INVITE,
                         saved.getId(),
                         creator.getName() + " propuso una Open Table en tu grupo"
-                );
+                ));
             }
         }
 
@@ -225,12 +226,12 @@ public class OpenTableService {
             boolean estaDentro = p.getRsvp() == ResponseStatusEnum.IN;
 
             if (!esElMismoQueSeUnio && estaDentro) {
-                notificationService.create(
+                notificationPublisher.publish(new NotificationEvent(
                         p.getUser().getId(),
                         NotificationTypeEnum.OPEN_TABLE_JOIN,
                         openTable.getId(),
                         user.getName() + " se unió a la Open Table"
-                );
+                ));
             }
         }
 

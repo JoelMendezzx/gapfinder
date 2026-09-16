@@ -1,11 +1,12 @@
 package com.backend.gapfinder.entities.friendship;
 
 import com.backend.gapfinder.entities.gap.GapRepository;
-import com.backend.gapfinder.entities.notification.NotificationService;
 import com.backend.gapfinder.entities.user.UserEntity;
 import com.backend.gapfinder.entities.user.UserService;
 import com.backend.gapfinder.enums.FriendshipStatusEnum;
 import com.backend.gapfinder.enums.NotificationTypeEnum;
+import com.backend.gapfinder.events.NotificationEvent;
+import com.backend.gapfinder.events.NotificationPublisher;
 import com.backend.gapfinder.exceptions.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -23,14 +24,14 @@ public class FriendshipService {
     private final FriendshipRepository friendshipRepository;
     private final UserService userService;
     private final GapRepository gapRepository;
-    private final NotificationService notificationService;
+    private final NotificationPublisher notificationPublisher;
 
     public FriendshipService(FriendshipRepository friendshipRepository, UserService userService,
-                             GapRepository gapRepository, NotificationService notificationService) {
+                             GapRepository gapRepository, NotificationPublisher notificationPublisher) {
         this.friendshipRepository = friendshipRepository;
         this.userService = userService;
         this.gapRepository = gapRepository;
-        this.notificationService = notificationService;
+        this.notificationPublisher = notificationPublisher;
     }
 
     // Enviar una solicitud de amistad
@@ -58,12 +59,12 @@ public class FriendshipService {
 
         FriendshipEntity saved = friendshipRepository.save(friendship);
 
-        notificationService.create(
+        notificationPublisher.publish(new NotificationEvent(
                 addresseeId,
                 NotificationTypeEnum.FRIEND_REQUEST,
                 saved.getId(),
                 requester.getName() + " te envió una solicitud de amistad"
-        );
+        ));
 
         log.info("Termina proceso de enviar solicitud de amistad de {} hacia {}", requesterId, addresseeId);
         return saved;
@@ -81,12 +82,12 @@ public class FriendshipService {
 
         FriendshipEntity saved = friendshipRepository.save(friendship);
 
-        notificationService.create(
+        notificationPublisher.publish(new NotificationEvent(
                 saved.getRequester().getId(),
                 NotificationTypeEnum.FRIEND_ACCEPTED,
                 saved.getId(),
                 saved.getAddressee().getName() + " aceptó tu solicitud de amistad"
-        );
+        ));
 
         log.info("Termina proceso de aceptar solicitud de amistad con id = {}", friendshipId);
         return saved;

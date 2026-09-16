@@ -7,9 +7,14 @@ import com.backend.gapfinder.entities.gap.GapService;
 import com.backend.gapfinder.entities.interest.InterestEntity;
 import com.backend.gapfinder.entities.user.UserEntity;
 import com.backend.gapfinder.entities.user.UserService;
+import com.backend.gapfinder.enums.NotificationTypeEnum;
+import com.backend.gapfinder.enums.MatchModeEnum;
+import com.backend.gapfinder.events.NotificationEvent;
+import com.backend.gapfinder.events.NotificationPublisher;
 import com.backend.gapfinder.enums.ActivityEffortEnum;
 import com.backend.gapfinder.enums.MatchStatusEnum;
 import com.backend.gapfinder.exceptions.NotFoundException;
+import com.backend.gapfinder.strategies.CompatibilityStrategy;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,7 +24,9 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Slf4j
@@ -33,35 +40,44 @@ public class MatchService {
     private final UserService userService;
     private final GapService gapService;
     private final ActivityService activityService;
+    private final NotificationPublisher notificationPublisher;
+    private final Map<MatchModeEnum, CompatibilityStrategy> strategies;
 
     public MatchService(
             MatchRepository matchRepository,
             UserService userService,
             GapService gapService,
-            ActivityService activityService) {
+            ActivityService activityService,
+            NotificationPublisher notificationPublisher,
+            List<CompatibilityStrategy> compatibilityStrategies) {
         this.matchRepository = matchRepository;
         this.userService = userService;
         this.gapService = gapService;
         this.activityService = activityService;
+        this.notificationPublisher = notificationPublisher;
+        this.strategies = compatibilityStrategies.stream()
+            .collect(Collectors.toMap(CompatibilityStrategy::getMode, strategy -> strategy));
     }
 
     // Buscar candidatos de match para un usuario: cualquier usuario de la app con
     // un GAP activo ahora mismo, sin match PENDING/ACCEPTED vigente con él,
     // ordenados de mayor a menor compatibilidad
     @Transactional(readOnly = true)
-    public List<MatchCandidate> findMatchCandidates(Long userId) {
-        log.info("Inicia proceso de buscar candidatos de match para el usuario con id = {}", userId);
+    public List<MatchCandidate> findMatchCandidates(Long userId, MatchModeEnum mode) {
+        log.info("Inicia proceso de buscar candidatos de match para el usuario con id = {} en modo {}", userId, mode);
 
         UserEntity me = userService.getById(userId);
         LocalDateTime now = LocalDateTime.now();
+        GapEntity myGap = getCurrentActiveGap(userId, now);
 
-        getCurrentActiveGap(userId, now);
+        CompatibilityStrategy strategy = getStrategy(mode);
 
         Set<Long> excludedIds = new HashSet<>(matchRepository.findActivePartnerIds(userId, ACTIVE_STATUSES));
 
         List<MatchCandidate> candidates = gapService.getActiveGapsExcludingUser(userId, now).stream()
                 .filter(gap -> !excludedIds.contains(gap.getUser().getId()))
-                .map(gap -> new MatchCandidate(gap.getUser(), gap, calculateCompatibility(me, gap.getUser())))
+            .map(gap -> new MatchCandidate(
+                gap.getUser(), gap, strategy.calculate(me, myGap, gap.getUser(), gap)))
                 .sorted(Comparator.comparingDouble(MatchCandidate::compatibility).reversed())
                 .toList();
 
@@ -112,8 +128,16 @@ public class MatchService {
         match.setStatus(MatchStatusEnum.PENDING);
         match.setCreatedAt(now);
 
+        MatchEntity saved = matchRepository.save(match);
+        notificationPublisher.publish(new NotificationEvent(
+            receiverId,
+            NotificationTypeEnum.MATCH_REQUEST,
+            saved.getId(),
+            requester.getName() + " te envió una solicitud de match"
+        ));
+
         log.info("Termina proceso de envío de match de {} hacia {}", requesterId, receiverId);
-        return matchRepository.save(match);
+        return saved;
     }
 
     @Transactional
@@ -129,8 +153,16 @@ public class MatchService {
 
         match.setStatus(MatchStatusEnum.ACCEPTED);
 
+        MatchEntity saved = matchRepository.save(match);
+        notificationPublisher.publish(new NotificationEvent(
+            saved.getRequester().getId(),
+            NotificationTypeEnum.MATCH_ACCEPTED,
+            saved.getId(),
+            saved.getReceiver().getName() + " aceptó tu solicitud de match"
+        ));
+
         log.info("Termina proceso de aceptar match con id = {}", matchId);
-        return matchRepository.save(match);
+        return saved;
     }
 
     @Transactional
@@ -146,8 +178,16 @@ public class MatchService {
 
         match.setStatus(MatchStatusEnum.REJECTED);
 
+        MatchEntity saved = matchRepository.save(match);
+        notificationPublisher.publish(new NotificationEvent(
+            saved.getRequester().getId(),
+            NotificationTypeEnum.MATCH_REJECTED,
+            saved.getId(),
+            saved.getReceiver().getName() + " rechazó tu solicitud de match"
+        ));
+
         log.info("Termina proceso de rechazar match con id = {}", matchId);
-        return matchRepository.save(match);
+        return saved;
     }
 
     @Transactional
@@ -224,36 +264,24 @@ public class MatchService {
         return matchRepository.save(match);
     }
 
-    // Compatibilidad entre dos usuarios: Jaccard sobre intereses en común + bonus por preferencia de esfuerzo igual
+    // Compatibilidad entre dos usuarios según el modo seleccionado
     @Transactional(readOnly = true)
-    public double calculateCompatibility(Long userAId, Long userBId) {
+    public double calculateCompatibility(Long userAId, Long userBId, MatchModeEnum mode) {
         UserEntity userA = userService.getById(userAId);
         UserEntity userB = userService.getById(userBId);
-        return calculateCompatibility(userA, userB);
+        LocalDateTime now = LocalDateTime.now();
+        GapEntity gapA = getCurrentActiveGap(userAId, now);
+        GapEntity gapB = getCurrentActiveGap(userBId, now);
+
+        return getStrategy(mode).calculate(userA, gapA, userB, gapB);
     }
 
-    private double calculateCompatibility(UserEntity userA, UserEntity userB) {
-        Set<Long> interestsA = toInterestIds(userA);
-        Set<Long> interestsB = toInterestIds(userB);
-
-        double interestScore;
-        if (interestsA.isEmpty() && interestsB.isEmpty()) {
-            interestScore = 0.0;
-        } else {
-            Set<Long> intersection = new HashSet<>(interestsA);
-            intersection.retainAll(interestsB);
-
-            Set<Long> union = new HashSet<>(interestsA);
-            union.addAll(interestsB);
-
-            interestScore = (double) intersection.size() / union.size();
+    private CompatibilityStrategy getStrategy(MatchModeEnum mode) {
+        CompatibilityStrategy strategy = strategies.get(mode);
+        if (strategy == null) {
+            throw new IllegalArgumentException("Modo de match no soportado: " + mode);
         }
-
-        boolean sameEffortPreference = userA.getActivityEffortPreference() != null
-                && userA.getActivityEffortPreference() == userB.getActivityEffortPreference();
-
-        double score = (interestScore * 0.8) + (sameEffortPreference ? 0.2 : 0.0);
-        return Math.round(score * 100.0) / 100.0;
+        return strategy;
     }
 
     // Buscar el GAP activo ahora mismo de un usuario; falla si no tiene ninguno

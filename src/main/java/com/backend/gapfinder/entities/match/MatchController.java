@@ -13,6 +13,7 @@ import com.backend.gapfinder.entities.user.UserBasicDTO;
 import com.backend.gapfinder.entities.activity.ActivityBasicDTO;
 import com.backend.gapfinder.entities.activity.ActivityEntity;
 import com.backend.gapfinder.entities.gap.GapBasicDTO;
+import com.backend.gapfinder.enums.MatchModeEnum;
 
 @RestController
 @RequestMapping("/matches")
@@ -27,10 +28,12 @@ public class MatchController {
     }
 
     // Busca candidatos de match para un usuario, ordenados por compatibilidad
-    // GET /matches/candidates?userId=1
+    // GET /matches/candidates?userId=1&mode=INTERESTS_EFFORT
     @GetMapping("/candidates")
-    public List<Map<String, Object>> getCandidates(@RequestParam Long userId) {
-        List<MatchService.MatchCandidate> candidates = matchService.findMatchCandidates(userId);
+    public List<Map<String, Object>> getCandidates(
+            @RequestParam Long userId,
+            @RequestParam MatchModeEnum mode) {
+        List<MatchService.MatchCandidate> candidates = matchService.findMatchCandidates(userId, mode);
 
         return candidates.stream()
                 .map(candidate -> {
@@ -104,10 +107,13 @@ public class MatchController {
     }
 
     // Calcula el porcentaje de compatibilidad entre dos usuarios
-    // GET /matches/compatibility?userAId=1&userBId=2
+    // GET /matches/compatibility?userAId=1&userBId=2&mode=INTERESTS_EFFORT
     @GetMapping("/compatibility")
-    public double getCompatibility(@RequestParam Long userAId, @RequestParam Long userBId) {
-        return matchService.calculateCompatibility(userAId, userBId);
+    public double getCompatibility(
+            @RequestParam Long userAId,
+            @RequestParam Long userBId,
+            @RequestParam MatchModeEnum mode) {
+        return matchService.calculateCompatibility(userAId, userBId, mode);
     }
    
     // Obtiene actividades sugeridas para un match según el tiempo disponible

@@ -4,6 +4,7 @@ import com.backend.gapfinder.entities.building.BuildingEntity;
 import com.backend.gapfinder.entities.building.BuildingService;
 import com.backend.gapfinder.entities.activity.ActivityEntity;
 import com.backend.gapfinder.entities.activity.ActivityService;
+import com.backend.gapfinder.entities.activity.ActivitySuggestion;
 import com.backend.gapfinder.entities.gap.GapService;
 import com.backend.gapfinder.entities.group.GroupEntity;
 import com.backend.gapfinder.entities.group.GroupService;
@@ -268,11 +269,14 @@ public class OpenTableService {
                 .map(InterestEntity::getId)
                 .collect(Collectors.toSet());
 
+        // El nivel de esfuerzo del usuario tambien filtra aqui, igual que en
+        // las sugerencias de un match: antes esta rama lo ignoraba y le
+        // ofrecia actividades ACTIVE a alguien que prefiere algo QUIET.
         return activityService.getAll().stream()
-                .filter(activity -> activity.getDurationMinutes() <= gapDurationMinutes)
-                .filter(activity -> activity.getInterest() == null
-                        || interestIds.contains(activity.getInterest().getId()))
-            .sorted(Comparator.comparing(activity -> activity.getInterest() == null))
+                .filter(ActivitySuggestion.fitsAvailableTime(gapDurationMinutes))
+                .filter(ActivitySuggestion.matchesAnyInterest(interestIds))
+                .filter(ActivitySuggestion.matchesEffort(user.getActivityEffortPreference()))
+                .sorted(Comparator.comparing(activity -> activity.getInterest() == null))
                 .toList();
     }
 

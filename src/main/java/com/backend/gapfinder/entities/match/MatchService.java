@@ -2,6 +2,7 @@ package com.backend.gapfinder.entities.match;
 
 import com.backend.gapfinder.entities.activity.ActivityEntity;
 import com.backend.gapfinder.entities.activity.ActivityService;
+import com.backend.gapfinder.entities.activity.ActivitySuggestion;
 import com.backend.gapfinder.entities.gap.GapEntity;
 import com.backend.gapfinder.entities.gap.GapService;
 import com.backend.gapfinder.entities.interest.InterestEntity;
@@ -300,43 +301,15 @@ public class MatchService {
         Set<Long> commonInterests = new HashSet<>(interestsA);
         commonInterests.retainAll(interestsB);
 
-        ActivityEffortEnum requiredEffort = resolveRequiredEffort(
+        ActivityEffortEnum requiredEffort = ActivitySuggestion.mostRestrictive(
                 match.getRequester().getActivityEffortPreference(),
                 match.getReceiver().getActivityEffortPreference());
 
         return activityService.getAll().stream()
-            .filter(activity -> fitsAvailableTime(activity, availableMinutes))
-            .filter(activity -> matchesCommonInterest(activity, commonInterests))
-            .filter(activity -> matchesEffortLevel(activity, requiredEffort))
+                .filter(ActivitySuggestion.fitsAvailableTime(availableMinutes))
+                .filter(ActivitySuggestion.matchesAnyInterest(commonInterests))
+                .filter(ActivitySuggestion.matchesEffort(requiredEffort))
                 .toList();
     }
 
-    // Gana la preferencia mas restrictiva de los dos: si a uno le sirve algo
-    // QUIET no se proponen actividades mas exigentes. Un usuario sin
-    // preferencia no restringe, y si ninguno tiene no se filtra por esfuerzo.
-    private ActivityEffortEnum resolveRequiredEffort(ActivityEffortEnum a, ActivityEffortEnum b) {
-        if (a == null) {
-            return b;
-        }
-        if (b == null) {
-            return a;
-        }
-        return a.ordinal() <= b.ordinal() ? a : b;
-    }
-
-    // Una actividad sin nivel de esfuerzo definido no se propone mientras haya
-    // una restriccion activa: no hay como saber si respeta el limite
-    private boolean matchesEffortLevel(ActivityEntity activity, ActivityEffortEnum requiredEffort) {
-        return requiredEffort == null
-            || activity.getActivityEffortLevel() == requiredEffort;
-    }
-
-        private boolean fitsAvailableTime(ActivityEntity activity, Integer availableMinutes) {
-        return activity.getDurationMinutes() <= availableMinutes;
-        }
-
-        private boolean matchesCommonInterest(ActivityEntity activity, Set<Long> commonInterests) {
-        return activity.getInterest() == null
-            || commonInterests.contains(activity.getInterest().getId());
-        }
 }

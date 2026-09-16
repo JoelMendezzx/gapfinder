@@ -30,11 +30,11 @@ services:
       db:
         condition: service_healthy
     environment:
-      # Pisan lo que dice application.properties, que apunta a localhost.
-      # Dentro de la red de compose la base se llama "db".
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/gapfinder
-      SPRING_DATASOURCE_USERNAME: gapfinder
-      SPRING_DATASOURCE_PASSWORD: gapfinder
+      # Pisan los valores por defecto de application.properties, que apuntan
+      # a localhost. Dentro de la red de compose la base se llama "db".
+      DB_URL: jdbc:postgresql://db:5432/gapfinder
+      DB_USERNAME: gapfinder
+      DB_PASSWORD: gapfinder
     ports:
       - "${APP_PORT:-8080}:8080"
 

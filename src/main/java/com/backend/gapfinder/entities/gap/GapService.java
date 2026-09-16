@@ -3,6 +3,7 @@ package com.backend.gapfinder.entities.gap;
 import com.backend.gapfinder.entities.classblock.ClassBlockEntity;
 import com.backend.gapfinder.entities.classblock.ClassBlockService;
 import com.backend.gapfinder.entities.user.UserEntity;
+import com.backend.gapfinder.enums.VisibilityScopeEnum;
 import com.backend.gapfinder.entities.user.UserService;
 import com.backend.gapfinder.enums.DayOfWeekEnum;
 import com.backend.gapfinder.exceptions.NotFoundException;
@@ -80,6 +81,7 @@ public class GapService {
         gap.setId(null);
         gap.setUser(user);
         gap.setDurationMinutes((int) java.time.Duration.between(gap.getStartTime(), gap.getEndTime()).toMinutes());
+        gap.setVisibilityScope(currentVisibilityScope(user));
 
         log.info("Termina proceso de creación de un GAP para el usuario con id = {}", userId);
         return gapRepository.save(gap);
@@ -138,7 +140,17 @@ public class GapService {
         gap.setStartTime(date.atTime(start));
         gap.setEndTime(date.atTime(end));
         gap.setDurationMinutes((int) java.time.Duration.between(start, end).toMinutes());
+        gap.setVisibilityScope(currentVisibilityScope(user));
         return gap;
+    }
+
+    // Visibilidad vigente del usuario al momento de publicar el GAP. Queda
+    // congelada en el GAP: si despues cambia su configuracion, los GAPs ya
+    // publicados conservan con que visibilidad salieron.
+    private VisibilityScopeEnum currentVisibilityScope(UserEntity user) {
+        return user.getVisibilitySettings() == null
+                ? null
+                : user.getVisibilitySettings().getVisibilityScope();
     }
 
     // Validar que los datos del GAP sean correctos

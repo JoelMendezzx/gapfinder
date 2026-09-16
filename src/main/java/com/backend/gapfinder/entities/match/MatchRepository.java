@@ -43,4 +43,12 @@ public interface MatchRepository extends JpaRepository<MatchEntity, Long> {
         @Param("userId") Long userId,
         @Param("statuses") List<MatchStatusEnum> statuses
     );
+
+    // BQ 7: cuantos matches (invitacion directa) hay en cada estado
+    @Query("""
+        SELECT m.status, COUNT(m.id)
+        FROM MatchEntity m
+        GROUP BY m.status
+    """)
+    List<Object[]> countByStatus();
 }

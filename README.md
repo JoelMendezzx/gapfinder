@@ -218,3 +218,61 @@ haya ramas largas abiertas.
 - **Nada de credenciales versionadas.** `application.properties` trae valores
   por defecto para local; todo lo demás entra por entorno (`DB_URL`,
   `DB_USERNAME`, `DB_PASSWORD`).
+
+---
+
+## Business Questions
+
+Se responden por HTTP, en `/analytics`:
+
+| BQ | Endpoint | Responde |
+|---|---|---|
+| 5 | `GET /analytics/gap-durations-without-match` | Qué duraciones de GAP terminan más seguido sin match |
+| 7 | `GET /analytics/connection-mechanisms` | Si convencen más los planes abiertos o las invitaciones directas |
+| 9 | `GET /analytics/visibility-outcomes` | Qué opción de visibilidad genera más conexiones aceptadas |
+
+El código vive en `entities/analytics/`, aparte de los servicios de dominio:
+son preguntas que cruzan varias entidades y no le pertenecen a ninguna sola.
+
+**Cómo se traduce cada pregunta a datos:**
+
+- **BQ 5** — un GAP "terminó sin match" si ningún `MatchEntity` que lo
+  referencia (como `requesterGap` o `receiverGap`) quedó en `ACCEPTED`. Se
+  agrupa por `durationMinutes` y se ordena por tasa sin match, de mayor a
+  menor.
+- **BQ 7** — *invitación directa* es un `Match`; *plan abierto* es sumarse a
+  una `OpenTable`. Del lado de los planes abiertos **se excluye al creador**:
+  entra solo, con RSVP `IN`, al crear la mesa, y contarlo como invitación
+  aceptada inflaría ese mecanismo frente al otro. La tasa se calcula sobre
+  las invitaciones ya respondidas, no sobre el total, para que las pendientes
+  no la castiguen.
+- **BQ 9** — se agrupa por `gap.visibilityScope` y se cuentan los matches
+  `ACCEPTED` que salieron de esos GAPs. Se reporta también **aceptadas por
+  GAP publicado**, porque comparar totales absolutos favorece a la opción que
+  simplemente se usó más.
+
+### Por qué la visibilidad se guarda en el GAP
+
+`GapEntity.visibilityScope` es una **foto** tomada al publicar el GAP, no una
+lectura de `VisibilitySettings`.
+
+Esa configuración es del usuario y mutable. Si la BQ 9 la leyera en vivo,
+cambiar la preferencia hoy reetiquetaría todos los GAPs pasados y la
+respuesta cambiaría sola, sin que hubiera pasado nada nuevo. Congelarla es lo
+que hace la pregunta respondible, y es lo que pide su definición: *visibility
+configuration **per published gap***.
+
+Consecuencia a tener presente: los GAPs creados antes de este cambio, y los
+de usuarios sin `VisibilitySettings`, quedan con `visibilityScope` nulo y se
+excluyen del reporte. No se inventa un valor por defecto, porque inventarlo
+sesgaría la respuesta.
+
+### Para probarlas
+
+El seed **no crea GAPs ni matches** a propósito: nacen del uso de la app. Con
+la base recién sembrada, los tres endpoints responden con listas vacías, que
+es lo correcto y no un error.
+
+Para una demo con números hay que generar el flujo desde la API: configurar
+`VisibilitySettings`, calcular GAPs con
+`POST /gaps/calculate?userId=..&date=..`, y crear y aceptar algunos matches.

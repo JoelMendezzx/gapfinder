@@ -3,6 +3,7 @@ package com.backend.gapfinder.entities.gap;
 import com.backend.gapfinder.BaseEntity;
 import com.backend.gapfinder.entities.userlocationlog.UserLocationLogEntity;
 import com.backend.gapfinder.entities.user.UserEntity;
+import com.backend.gapfinder.enums.VisibilityScopeEnum;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -26,6 +27,17 @@ public class GapEntity extends BaseEntity {
     private LocalDateTime endTime;
 
     private int durationMinutes;
+
+    // Visibilidad con la que se publico este GAP.
+    //
+    // Es una FOTO tomada al crearlo, no una lectura de VisibilitySettings:
+    // esa configuracion es del usuario y puede cambiar en cualquier momento,
+    // y si se leyera en vivo, cambiarla reescribiria la historia de todos los
+    // GAPs pasados. Guardarla aqui es lo que hace respondible la BQ 9
+    // (que opcion de visibilidad genera mas conexiones aceptadas).
+    @Enumerated(EnumType.STRING)
+    @Column(name = "visibility_scope")
+    private VisibilityScopeEnum visibilityScope;
 
     // Usuario dueño de este GAP
     @ManyToOne(fetch = FetchType.LAZY)

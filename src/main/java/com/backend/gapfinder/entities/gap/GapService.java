@@ -202,7 +202,7 @@ public class GapService {
         );
     }
 
-        // Job automático: revisa GAPs próximos a comenzar, que ya comenzaron,
+    // Job automático: revisa GAPs próximos a comenzar, que ya comenzaron,
     // próximos a terminar, o que ya terminaron, y notifica una sola vez cada evento
     @Scheduled(fixedRate = 600000)
     @Transactional

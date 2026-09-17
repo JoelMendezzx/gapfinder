@@ -3,8 +3,6 @@ package com.backend.gapfinder.entities.notification;
 import com.backend.gapfinder.entities.user.UserEntity;
 import com.backend.gapfinder.entities.user.UserService;
 import com.backend.gapfinder.enums.NotificationTypeEnum;
-import com.backend.gapfinder.events.NotificationEvent;
-import com.backend.gapfinder.events.NotificationListener;
 import com.backend.gapfinder.exceptions.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +14,7 @@ import java.util.List;
 
 @Slf4j
 @Service
-public class NotificationService implements NotificationListener {
+public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserService userService;
@@ -24,13 +22,6 @@ public class NotificationService implements NotificationListener {
     public NotificationService(NotificationRepository notificationRepository, UserService userService) {
         this.notificationRepository = notificationRepository;
         this.userService = userService;
-    }
-
-    // --- AQUÍ CONECTAMOS EL PATRÓN OBSERVER ---
-    @Override
-    public void onNotificationEvent(NotificationEvent event) {
-        log.info("NotificationService (Observer) escuchó un evento de tipo {} para el usuario {}", event.type(), event.userId());
-        this.create(event.userId(), event.type(), event.referenceId(), event.message());
     }
 
     // Genera una nueva notificación para un usuario

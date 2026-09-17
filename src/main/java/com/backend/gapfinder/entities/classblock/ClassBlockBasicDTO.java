@@ -13,4 +13,15 @@ public class ClassBlockBasicDTO {
 	private DayOfWeekEnum dayOfWeek;
 	private LocalTime startTime;
 	private LocalTime endTime;
+
+	public static ClassBlockBasicDTO fromEntity(ClassBlockEntity entity) {
+		ClassBlockBasicDTO dto = new ClassBlockBasicDTO();
+		dto.setId(entity.getId());
+		dto.setSubject(entity.getSubject());
+		dto.setLocation(entity.getLocation());
+		dto.setDayOfWeek(entity.getDayOfWeek());
+		dto.setStartTime(entity.getStartTime());
+		dto.setEndTime(entity.getEndTime());
+		return dto;
+	}
 }

@@ -2,6 +2,7 @@ package com.backend.gapfinder.entities.classblock;
 
 import com.backend.gapfinder.entities.user.UserEntity;
 import com.backend.gapfinder.entities.user.UserService;
+import com.backend.gapfinder.exceptions.DuplicateClassBlockException;
 import com.backend.gapfinder.exceptions.NotFoundException;
 
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +48,22 @@ public class ClassBlockService {
         log.info("Inicia proceso de creación de una clase para el usuario con id = {}", userId);
 
         validateClassBlockData(classBlock);
+
+        boolean yaExiste = classBlockRepository.existsByUserIdAndSubjectAndDayOfWeekAndStartTimeAndEndTime(
+            userId,
+            classBlock.getSubject(),
+            classBlock.getDayOfWeek(),
+            classBlock.getStartTime(),
+            classBlock.getEndTime()
+        );
+
+        if (yaExiste) {
+            log.info("El bloque '{}' ({}, {}-{}) ya existe para el usuario {}, se omite",
+                classBlock.getSubject(), classBlock.getDayOfWeek(),
+                classBlock.getStartTime(), classBlock.getEndTime(), userId);
+            throw new DuplicateClassBlockException(
+                "Ya existe un bloque igual para este usuario: " + classBlock.getSubject());
+        }
 
         UserEntity user = userService.getById(userId);
         classBlock.setId(null);

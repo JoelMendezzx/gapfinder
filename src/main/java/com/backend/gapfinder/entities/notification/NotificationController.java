@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,26 +16,6 @@ public class NotificationController {
     public NotificationController(NotificationService notificationService, ModelMapper modelMapper) {
         this.notificationService = notificationService;
         this.modelMapper = modelMapper;
-    }
-
-    // Crea una nueva notificación
-    // POST /notifications?userId=1&type=MATCH_REQUEST&referenceId=7&message=Hola
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public NotificationBasicDTO createNotification(
-            @RequestParam Long userId,
-            @RequestParam String type,
-            @RequestParam(required = false) Long referenceId,
-            @RequestParam String message) {
-
-        NotificationEntity notification = notificationService.create(
-                userId,
-                com.backend.gapfinder.enums.NotificationTypeEnum.valueOf(type),
-                referenceId,
-                message
-        );
-
-        return modelMapper.map(notification, NotificationBasicDTO.class);
     }
 
     // Obtiene todas las notificaciones de un usuario

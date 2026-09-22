@@ -1,12 +1,11 @@
 package com.backend.gapfinder.strategies;
 
-import com.backend.gapfinder.entities.gap.GapEntity;
-import com.backend.gapfinder.entities.user.UserEntity;
 import com.backend.gapfinder.enums.MatchModeEnum;
+import com.backend.gapfinder.model.UserModel;
 import org.springframework.stereotype.Component;
 
 @Component
-public class SameProgramCompatibilityStrategy extends AbstractCompatibilityStrategy {
+public class SameProgramCompatibilityStrategy implements CompatibilityStrategy {
 
     @Override
     public MatchModeEnum getMode() {
@@ -14,7 +13,7 @@ public class SameProgramCompatibilityStrategy extends AbstractCompatibilityStrat
     }
 
     @Override
-    protected double calculatePrimaryScore(UserEntity userA, GapEntity gapA, UserEntity userB, GapEntity gapB) {
+    public double calculate(UserModel userA, UserModel userB) {
         if (userA.getProgram() == null || userB.getProgram() == null) {
             return 0.0;
         }

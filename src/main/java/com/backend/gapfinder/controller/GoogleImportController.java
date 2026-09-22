@@ -1,0 +1,25 @@
+package com.backend.gapfinder.controller;
+
+import com.backend.gapfinder.dto.response.GoogleImportResult;
+import com.backend.gapfinder.model.UserModel;
+import com.backend.gapfinder.service.GoogleScheduleImportService;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/google")
+public class GoogleImportController {
+
+    private final GoogleScheduleImportService importService;
+
+    public GoogleImportController(GoogleScheduleImportService importService) {
+        this.importService = importService;
+    }
+
+    @PostMapping("/import-schedule")
+    public GoogleImportResult importSchedule(@AuthenticationPrincipal UserModel user) throws Exception {
+        return importService.importSchedule(user.getId());
+    }
+}

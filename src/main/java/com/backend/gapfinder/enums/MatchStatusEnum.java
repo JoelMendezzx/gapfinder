@@ -1,8 +1,8 @@
 package com.backend.gapfinder.enums;
 
 public enum MatchStatusEnum {
-    PENDING,
-    ACCEPTED,
+    WAITING_RESPONSE,
+    HAPPENING_NOW,
     REJECTED,
-    CANCELLED
+    CLOSED
 }

@@ -1,5 +1,7 @@
 package com.backend.gapfinder.security;
 
+import com.backend.gapfinder.repository.UserRepository;
+import com.backend.gapfinder.service.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,8 +11,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import com.backend.gapfinder.entities.user.UserRepository;
 
 import java.io.IOException;
 import java.util.List;
